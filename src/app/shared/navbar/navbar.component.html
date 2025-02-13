@@ -15,9 +15,11 @@
     <button class="search-btn">
       <span class="material-icons">search</span>
     </button>
-    <button class="profile-btn">
+    <button class="profile-btn" (click)="openAuthModal()">
       <span class="material-icons">person</span>
     </button>
     <button class="explore-btn">Explore Now</button>
   </div>
 </nav>
+
+<app-auth-modal #authModal></app-auth-modal>

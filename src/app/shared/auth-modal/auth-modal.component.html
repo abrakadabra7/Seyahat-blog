@@ -1,0 +1,58 @@
+<div class="modal-overlay" [class.show]="isVisible" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeModal()">
+      <span class="material-icons">close</span>
+    </button>
+
+    <div class="tabs">
+      <button [class.active]="activeTab === 'login'" (click)="activeTab = 'login'">
+        <span class="material-icons">login</span>
+        Giriş Yap
+      </button>
+      <button [class.active]="activeTab === 'register'" (click)="activeTab = 'register'">
+        <span class="material-icons">person_add</span>
+        Kayıt Ol
+      </button>
+    </div>
+
+    <div class="auth-container">
+      <form class="auth-form" *ngIf="activeTab === 'login'">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="Email adresinizi girin">
+        </div>
+        <div class="form-group">
+          <label>Şifre</label>
+          <input type="password" placeholder="Şifrenizi girin">
+        </div>
+        <button class="submit-btn">
+          <span class="material-icons">login</span>
+          Giriş Yap
+        </button>
+      </form>
+
+      <form class="auth-form" *ngIf="activeTab === 'register'">
+        <div class="form-group">
+          <label>Ad Soyad</label>
+          <input type="text" placeholder="Adınızı ve soyadınızı girin">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="Email adresinizi girin">
+        </div>
+        <div class="form-group">
+          <label>Şifre</label>
+          <input type="password" placeholder="Şifrenizi girin">
+        </div>
+        <div class="form-group">
+          <label>Şifre Tekrar</label>
+          <input type="password" placeholder="Şifrenizi tekrar girin">
+        </div>
+        <button class="submit-btn">
+          <span class="material-icons">person_add</span>
+          Kayıt Ol
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
