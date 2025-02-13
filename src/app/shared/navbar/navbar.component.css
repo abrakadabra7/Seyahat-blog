@@ -4,17 +4,13 @@
   align-items: center;
   padding: 1.5rem 4rem;
   background-color: transparent !important;
-  position: fixed;
+  position: absolute;
   width: 80%;
   top: 0;
   left: 9%;
   z-index: 1000;
   transition: background-color 0.3s ease;
   border-bottom: 0.5px solid #c0bdbd; 
-}
-
-.navbar.scrolled {
-  background-color: rgba(0, 0, 0, 0.8) !important;
 }
 
 .logo {
