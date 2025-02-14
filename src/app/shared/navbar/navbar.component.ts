@@ -1,6 +1,6 @@
 import { Component, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 
 @Component({
@@ -14,6 +14,8 @@ export class NavbarComponent {
   isScrolled = false;
   @ViewChild('authModal') authModal!: AuthModalComponent;
 
+  constructor(private router: Router) {}
+
   @HostListener('window:scroll', [])
   onWindowScroll() {
     this.isScrolled = window.scrollY > 50;
@@ -21,5 +23,9 @@ export class NavbarComponent {
 
   openAuthModal() {
     this.authModal.openModal();
+  }
+
+  navigateToContact() {
+    this.router.navigate(['/contact']);
   }
 }

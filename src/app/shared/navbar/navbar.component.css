@@ -37,12 +37,14 @@
   letter-spacing: 1px;
   transition: color 0.3s ease;
   text-transform: uppercase;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid transparent;
 }
 
-.nav-links a:hover {
+.nav-links a:hover,
+.nav-links a.active {
   color: #e0e0e0;
   border-bottom: 2px solid #e0e0e0;
-  padding-bottom: 0.5rem;
 }
 
 .nav-right {

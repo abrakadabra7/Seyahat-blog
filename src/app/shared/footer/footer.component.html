@@ -1,0 +1,90 @@
+<footer class="footer">
+  <!-- Footer Top -->
+  <div class="footer-top">
+    <div class="footer-top-content">
+      <div class="top-nav">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        <a routerLink="/blog" routerLinkActive="active">Blog</a>
+        <a routerLink="/about" routerLinkActive="active">About</a>
+        <a routerLink="/contact" routerLinkActive="active">Contact</a>
+      </div>
+      
+      <div class="social-links">
+        <a *ngFor="let social of socialLinks" 
+           [href]="social.url" 
+           target="_blank" 
+           class="social-link"
+           [title]="social.name">
+          <span class="material-icons">{{social.icon}}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-content">
+    <!-- About Us Section -->
+    <div class="footer-section">
+      <h3>About Us</h3>
+      <ul>
+        <li *ngFor="let link of aboutLinks">
+          <a [routerLink]="link.path">{{link.title}}</a>
+        </li>
+      </ul>
+      <div class="achievements">
+        <h3>Achievements</h3>
+        <p>Massa sed elementum tempus egestas sed sed risus at ultrices mi tempus imperdiet nulla.</p>
+      </div>
+    </div>
+
+    <!-- Quick Links Section -->
+    <div class="footer-section">
+      <h3>Quick Links</h3>
+      <ul>
+        <li *ngFor="let link of quickLinks">
+          <a [routerLink]="link.path">{{link.title}}</a>
+        </li>
+      </ul>
+      <div class="useful-info">
+        <h3>Useful Information</h3>
+        <p>Amet commodo nulla facilisi nullam vehicula ipsum. Faucibus pulvinar elementum integer enim.</p>
+      </div>
+    </div>
+
+    <!-- Important Links Section -->
+    <div class="footer-section">
+      <h3>Important Links</h3>
+      <ul>
+        <li *ngFor="let link of importantLinks">
+          <a [routerLink]="link.path">{{link.title}}</a>
+        </li>
+      </ul>
+      <div class="targets">
+        <h3>Targets & Plans</h3>
+        <p>Fringilla urna porttitor rhoncus dolor purus nonulla malesuada pellentesque elit eget.</p>
+      </div>
+    </div>
+
+    <!-- Contact Info Section -->
+    <div class="footer-section">
+      <h3>Contact Info</h3>
+      <p class="contact-description">{{contactInfo.description}}</p>
+      
+      <div class="contact-details">
+        <div class="contact-item">
+          <span class="material-icons">location_on</span>
+          <p>{{contactInfo.address}}</p>
+        </div>
+        
+        <div class="contact-item">
+          <span class="material-icons">phone</span>
+          <p>{{contactInfo.phone}}</p>
+        </div>
+        
+        <div class="contact-item">
+          <span class="material-icons">smartphone</span>
+          <p>{{contactInfo.mobile}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer> 

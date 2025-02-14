@@ -1,14 +1,14 @@
 <nav class="navbar" [class.scrolled]="isScrolled">
   <div class="logo">
-    <a href="#"><img src="./assets/images/logo.png" alt="Logo"></a>
+    <a routerLink="/"><img src="./assets/images/logo.png" alt="Logo"></a>
     
   </div>
 
   <div class="nav-links">
-    <a href="#">HOME</a>
-    <a href="#">BLOG</a>
-    <a href="#">ABOUT</a>
-    <a href="#">CONTACT</a>
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">HOME</a>
+    <a routerLink="/blog" routerLinkActive="active">BLOG</a>
+    <a routerLink="/about" routerLinkActive="active">ABOUT</a>
+    <a routerLink="/contact" routerLinkActive="active">CONTACT</a>
   </div>
 
   <div class="nav-right">
