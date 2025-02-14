@@ -1,0 +1,48 @@
+<section class="trips-gallery">
+  <div class="section-header">
+    <span class="section-subtitle">TRIPS GALLERY</span>
+    <h2 class="section-title">Completed Journeys</h2>
+  </div>
+
+  <div class="gallery-container">
+    <!-- Featured Trip (Büyük Kart) -->
+    <div class="featured-trip" *ngFor="let trip of trips | slice:0:1">
+      <div class="trip-card featured">
+        <img [src]="trip.image" [alt]="trip.title">
+        <div class="trip-content">
+          <div class="rating">
+            <span class="material-icons" *ngFor="let star of [].constructor(5); let i = index">
+              {{i < trip.rating ? 'star' : 'star_border'}}
+            </span>
+          </div>
+          <h3>{{trip.title}}</h3>
+          <p>{{trip.description}}</p>
+          <a href="#" class="read-more">
+            Read More
+            <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Regular Trips (Kare Kartlar) -->
+    <div class="regular-trips">
+      <div class="trip-card" *ngFor="let trip of trips | slice:1">
+        <img [src]="trip.image" [alt]="trip.title">
+        <div class="trip-content">
+          <div class="rating">
+            <span class="material-icons" *ngFor="let star of [].constructor(5); let i = index">
+              {{i < trip.rating ? 'star' : 'star_border'}}
+            </span>
+          </div>
+          <h3>{{trip.title}}</h3>
+          <p>{{trip.description}}</p>
+          <a href="#" class="read-more">
+            Read More
+            <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> 

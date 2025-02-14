@@ -1,0 +1,172 @@
+.trips-gallery {
+  padding: 6rem 4rem;
+  background-color: #f8f9fa;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.section-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.gallery-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.featured-trip {
+  width: 100%;
+}
+
+.trip-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  height: 100%;
+}
+
+.trip-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.trip-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.trip-card:hover img {
+  transform: scale(1.1);
+}
+
+.trip-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  color: white;
+}
+
+.rating {
+  margin-bottom: 1rem;
+}
+
+.rating .material-icons {
+  color: #ffd700;
+  font-size: 1.2rem;
+}
+
+.trip-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.trip-content p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+.read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.read-more:hover {
+  gap: 0.8rem;
+}
+
+.read-more .material-icons {
+  font-size: 1.2rem;
+}
+
+.regular-trips {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+.featured-trip .trip-card {
+  height: 600px;
+}
+
+.regular-trips .trip-card {
+  height: 400px;
+}
+
+/* Responsive Tasarım */
+@media (min-width: 992px) {
+  .regular-trips {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 991px) {
+  .regular-trips {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .trips-gallery {
+    padding: 4rem 2rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .featured-trip .trip-card {
+    height: 400px;
+  }
+
+  .regular-trips .trip-card {
+    height: 300px;
+  }
+}
+
+@media (max-width: 576px) {
+  .regular-trips {
+    grid-template-columns: 1fr;
+  }
+
+  .trip-content h3 {
+    font-size: 1.2rem;
+  }
+
+  .trip-content p {
+    font-size: 0.8rem;
+  }
+} 
