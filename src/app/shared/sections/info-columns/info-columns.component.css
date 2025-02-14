@@ -1,0 +1,83 @@
+.info-columns {
+  padding: 4rem;
+  background-color: #ffffff;
+  background-image: url('/assets/images/pattern-light.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.columns-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4rem;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.column-title {
+  font-size: 1.7rem;
+  color: #333;
+  font-weight: 600;
+  line-height: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+.column-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.column-text {
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 992px) {
+  .info-columns {
+    padding: 3rem 2rem;
+  }
+
+  .columns-container {
+    gap: 3rem;
+  }
+
+  .column-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .columns-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .column-title {
+    font-size: 1.6rem;
+  }
+
+  .column-text {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .info-columns {
+    padding: 2rem 1rem;
+  }
+
+  .column-title {
+    font-size: 1.4rem;
+  }
+} 

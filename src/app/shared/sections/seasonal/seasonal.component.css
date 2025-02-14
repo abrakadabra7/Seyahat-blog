@@ -1,0 +1,241 @@
+.seasonal-section {
+  padding: 4rem 4rem;
+  background-image: 
+    linear-gradient(to bottom right, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3)),
+    url('/assets/images/blog-bg1.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.section-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  letter-spacing: 2px;  
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.seasons-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.season-selector {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+
+.season-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  background: white;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #666;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.season-btn .material-icons {
+  font-size: 1.2rem;
+}
+
+.season-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.season-btn.active {
+  background: #333;
+  color: white;
+}
+
+.season-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.season-title {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 0.8rem;
+}
+
+.season-description {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.season-details {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.8rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.detail-item .material-icons {
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.detail-content h4 {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 0.3rem;
+}
+
+.activities-list, .gear-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.activities-list span, .gear-list span {
+  font-size: 0.8rem;
+  color: #666;
+  padding: 0.2rem 0.6rem;
+  background: white;
+  border-radius: 50px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.explore-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.explore-btn:hover {
+  background: #444;
+  transform: translateY(-2px);
+}
+
+.season-image {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.season-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.season-image:hover img {
+  transform: scale(1.05);
+}
+
+.featured-trip .trip-card {
+  height: 400px;
+}
+
+.regular-trips .trip-card {
+  height: 300px;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 1200px) {
+  .seasonal-section {
+    padding: 4rem 2rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .season-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .season-image {
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .season-selector {
+    flex-wrap: wrap;
+  }
+
+  .season-btn {
+    width: calc(50% - 0.5rem);
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .season-title {
+    font-size: 1.5rem;
+  }
+
+  .seasonal-section {
+    padding: 3rem 2rem;
+  }
+
+  .featured-trip .trip-card {
+    height: 300px;
+  }
+
+  .regular-trips .trip-card {
+    height: 250px;
+  }
+}
+
+@media (max-width: 576px) {
+  .seasonal-section {
+    padding: 2rem 1rem;
+  }
+
+  .season-content {
+    padding: 1rem;
+  }
+
+  .season-btn {
+    width: 100%;
+  }
+} 

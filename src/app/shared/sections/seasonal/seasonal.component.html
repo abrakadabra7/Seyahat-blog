@@ -1,0 +1,61 @@
+<section class="seasonal-section">
+  <div class="section-header">
+    <span class="section-subtitle">SEASONAL PICKS</span>
+    <h2 class="section-title">Travel by Season</h2>
+  </div>
+
+  <div class="seasons-container">
+    <!-- Season Selector -->
+    <div class="season-selector">
+      <button 
+        *ngFor="let season of seasons" 
+        [class.active]="currentSeason.id === season.id"
+        (click)="selectSeason(season)"
+        class="season-btn">
+        <span class="material-icons">
+          {{season.name === 'Winter' ? 'ac_unit' : 
+            season.name === 'Spring' ? 'local_florist' :
+            season.name === 'Summer' ? 'wb_sunny' : 'eco'}}
+        </span>
+        {{season.name}}
+      </button>
+    </div>
+
+    <!-- Current Season Display -->
+    <div class="season-content" *ngIf="currentSeason">
+      <div class="season-info">
+        <h3 class="season-title">{{currentSeason.title}}</h3>
+        <p class="season-description">{{currentSeason.description}}</p>
+        
+        <div class="season-details">
+          <div class="detail-item">
+            <span class="material-icons">thermostat</span>
+            <div class="detail-content">
+              <h4>Season</h4>
+              <p>{{currentSeason.temperature}}</p>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <span class="material-icons">hiking</span>
+            <div class="detail-content">
+              <h4>Activities</h4>
+              <div class="activities-list">
+                <span *ngFor="let activity of currentSeason.activities">{{activity}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="explore-btn">
+          Explore
+          <span class="material-icons">arrow_forward</span>
+        </button>
+      </div>
+
+      <div class="season-image">
+        <img [src]="currentSeason.image" [alt]="currentSeason.name + ' activities'">
+      </div>
+    </div>
+  </div>
+</section> 

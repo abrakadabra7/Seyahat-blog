@@ -1,0 +1,12 @@
+<section class="info-columns">
+  <div class="columns-container">
+    <div class="column" *ngFor="let column of columns">
+      <h2 class="column-title">{{column.title}}</h2>
+      <div class="column-content">
+        <p *ngFor="let paragraph of column.paragraphs" class="column-text">
+          {{paragraph}}
+        </p>
+      </div>
+    </div>
+  </div>
+</section> 
