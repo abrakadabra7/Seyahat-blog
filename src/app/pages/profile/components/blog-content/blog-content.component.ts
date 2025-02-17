@@ -130,9 +130,22 @@ export class BlogContentComponent implements OnChanges {
         return;
       }
 
+      if (this.selectedFiles.length === 0) {
+        this.error = 'Lütfen en az bir fotoğraf yükleyin';
+        return;
+      }
+
       // İlk fotoğrafı kapak fotoğrafı olarak kullan
       const coverFile = this.selectedFiles[0];
-      const blog = await this.supabaseService.addBlog(this.newBlog, coverFile);
+      // Diğer fotoğrafları ek fotoğraflar olarak kullan
+      const additionalFiles = this.selectedFiles.slice(1);
+      
+      const blog = await this.supabaseService.addBlog(
+        this.newBlog, 
+        coverFile, 
+        additionalFiles
+      );
+      
       this.blogs = [blog, ...this.blogs];
       this.resetForm();
     } catch (error: any) {

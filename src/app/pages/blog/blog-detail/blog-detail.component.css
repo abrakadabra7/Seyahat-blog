@@ -148,13 +148,15 @@
   white-space: pre-wrap;
   word-wrap: break-word;
 }
-
 .side-images {
   display: flex;
   flex-direction: column;
   gap: 2rem;
   position: sticky;
   top: 2rem;
+}
+.side-images.right {
+ margin-top: -2rem;
 }
 
 .side-images .image-item {

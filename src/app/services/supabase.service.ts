@@ -91,7 +91,31 @@ export class SupabaseService {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data as Blog[];
+
+    // Her blog için fotoğrafların public URL'lerini al
+    const blogsWithUrls = await Promise.all(data.map(async (blog) => {
+      // Kapak fotoğrafı için public URL al
+      if (blog.image_url) {
+        const { data: { publicUrl: coverImageUrl } } = supabase.storage
+          .from('blog-images')
+          .getPublicUrl(blog.image_url);
+        blog.image_url = coverImageUrl;
+      }
+
+      // Ek fotoğraflar için public URL'leri al
+      if (blog.images && blog.images.length > 0) {
+        blog.images = blog.images.map((imagePath: string) => {
+          const { data: { publicUrl } } = supabase.storage
+            .from('blog-images')
+            .getPublicUrl(imagePath);
+          return publicUrl;
+        });
+      }
+
+      return blog;
+    }));
+
+    return blogsWithUrls as Blog[];
   }
 
   async getAllBlogs() {
@@ -107,9 +131,10 @@ export class SupabaseService {
       if (blogsError) throw blogsError;
       if (!blogs) return [];
 
-      // Her blog için profil bilgisini al
-      const blogsWithProfiles = await Promise.all(
+      // Her blog için profil bilgisini ve fotoğraf URL'lerini al
+      const blogsWithProfilesAndUrls = await Promise.all(
         blogs.map(async (blog) => {
+          // Profil bilgisini al
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('full_name')
@@ -121,40 +146,74 @@ export class SupabaseService {
             return { ...blog, profiles: { full_name: 'Anonim' } };
           }
 
+          // Kapak fotoğrafı için public URL al
+          if (blog.image_url) {
+            const { data: { publicUrl: coverImageUrl } } = supabase.storage
+              .from('blog-images')
+              .getPublicUrl(blog.image_url);
+            blog.image_url = coverImageUrl;
+          }
+
+          // Ek fotoğraflar için public URL'leri al
+          if (blog.images && blog.images.length > 0) {
+            blog.images = blog.images.map((imagePath: string) => {
+              const { data: { publicUrl } } = supabase.storage
+                .from('blog-images')
+                .getPublicUrl(imagePath);
+              return publicUrl;
+            });
+          }
+
           return { ...blog, profiles: profile };
         })
       );
 
-      return blogsWithProfiles;
+      return blogsWithProfilesAndUrls;
     } catch (error) {
       throw error;
     }
   }
 
-  async addBlog(blog: Blog, file: File): Promise<Blog> {
+  async addBlog(blog: Blog, coverFile: File, additionalFiles?: File[]): Promise<Blog> {
     const supabase = this.ensureSupabaseInitialized();
     try {
-      if (file) {
-        const fileExt = file.name.split('.').pop();
+      const currentUser = this.currentUser.value;
+      if (!currentUser) throw new Error('Kullanıcı oturum açmamış');
+
+      // Kapak fotoğrafını yükle
+      if (coverFile) {
+        const fileExt = coverFile.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
-        const currentUser = this.currentUser.value;
-        if (!currentUser) throw new Error('Kullanıcı oturum açmamış');
-        
         const filePath = `${currentUser.id}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('blog-images')
-          .upload(filePath, file);
+          .upload(filePath, coverFile);
 
         if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('blog-images')
-          .getPublicUrl(filePath);
-
-        blog.image_url = publicUrl;
+        blog.image_url = filePath;
       }
 
+      // Ek fotoğrafları yükle
+      blog.images = [];
+      if (additionalFiles && additionalFiles.length > 0) {
+        const uploadPromises = additionalFiles.map(async (file) => {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Math.random()}.${fileExt}`;
+          const filePath = `${currentUser.id}/${fileName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('blog-images')
+            .upload(filePath, file);
+
+          if (uploadError) throw uploadError;
+          return filePath;
+        });
+
+        blog.images = await Promise.all(uploadPromises);
+      }
+
+      // Blog'u veritabanına kaydet
       const { data, error } = await supabase
         .from('blogs')
         .insert(blog)
@@ -162,6 +221,24 @@ export class SupabaseService {
         .single();
 
       if (error) throw error;
+
+      // Public URL'leri al
+      if (data.image_url) {
+        const { data: { publicUrl: coverImageUrl } } = supabase.storage
+          .from('blog-images')
+          .getPublicUrl(data.image_url);
+        data.image_url = coverImageUrl;
+      }
+
+      if (data.images && data.images.length > 0) {
+        data.images = data.images.map((imagePath: string) => {
+          const { data: { publicUrl } } = supabase.storage
+            .from('blog-images')
+            .getPublicUrl(imagePath);
+          return publicUrl;
+        });
+      }
+
       return data;
     } catch (error: any) {
       throw new Error(error.message);
@@ -287,6 +364,24 @@ export class SupabaseService {
       if (profileError) {
         console.error('Profil getirme hatası:', profileError);
         return { ...blog, profiles: { full_name: 'Anonim' } };
+      }
+
+      // Kapak fotoğrafı için public URL al
+      if (blog.image_url) {
+        const { data: { publicUrl: coverImageUrl } } = supabase.storage
+          .from('blog-images')
+          .getPublicUrl(blog.image_url);
+        blog.image_url = coverImageUrl;
+      }
+
+      // Ek fotoğraflar için public URL'leri al
+      if (blog.images && blog.images.length > 0) {
+        blog.images = blog.images.map((imagePath: string) => {
+          const { data: { publicUrl } } = supabase.storage
+            .from('blog-images')
+            .getPublicUrl(imagePath);
+          return publicUrl;
+        });
       }
 
       return { ...blog, profiles: profile };
