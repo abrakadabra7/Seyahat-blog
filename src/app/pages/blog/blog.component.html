@@ -6,5 +6,43 @@
 </section>
 
 <section class="blog-content">
-  <!-- Blog içeriği buraya gelecek -->
+  <!-- Hata Mesajı -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Yükleniyor -->
+  <div *ngIf="loading" class="loading">
+    <span class="material-icons">sync</span>
+    Yükleniyor...
+  </div>
+
+  <!-- Blog Listesi -->
+  <div class="blog-list" *ngIf="!loading">
+    <article class="blog-item" *ngFor="let blog of blogs">
+      <div class="blog-category">
+        {{blog.category}}
+      </div>
+      
+      <h2 class="blog-title">
+        {{blog.title}}
+      </h2>
+      
+      <div class="blog-image">
+        <img [src]="blog.image_url" [alt]="blog.title">
+      </div>
+      
+      <p class="blog-text">
+        {{blog.content}}
+      </p>
+      
+      <div class="blog-meta">
+        <div class="author-info">
+          <img src="assets/images/avatar.jpg" [alt]="blog.profiles?.full_name">
+          <span class="author">{{blog.profiles?.full_name}}</span>
+        </div>
+        <span class="date">{{blog.created_at | date:'MMMM d, y'}}</span>
+      </div>
+    </article>
+  </div>
 </section> 

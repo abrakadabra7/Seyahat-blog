@@ -94,6 +94,43 @@ export class SupabaseService {
     return data as Blog[];
   }
 
+  async getAllBlogs() {
+    const supabase = this.ensureSupabaseInitialized();
+    
+    try {
+      // Önce tüm blogları getir
+      const { data: blogs, error: blogsError } = await supabase
+        .from('blogs')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (blogsError) throw blogsError;
+      if (!blogs) return [];
+
+      // Her blog için profil bilgisini al
+      const blogsWithProfiles = await Promise.all(
+        blogs.map(async (blog) => {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', blog.user_id)
+            .single();
+
+          if (profileError) {
+            console.error('Profil getirme hatası:', profileError);
+            return { ...blog, profiles: { full_name: 'Anonim' } };
+          }
+
+          return { ...blog, profiles: profile };
+        })
+      );
+
+      return blogsWithProfiles;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async addBlog(blog: Blog, file: File): Promise<Blog> {
     const supabase = this.ensureSupabaseInitialized();
     try {

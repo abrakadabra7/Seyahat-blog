@@ -1,5 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SupabaseService } from '../../services/supabase.service';
+import { Router } from '@angular/router';
+
+interface Blog {
+  id?: string;
+  user_id: string;
+  title: string;
+  content: string;
+  image_url?: string;
+  category: string;
+  created_at?: string;
+  updated_at?: string;
+  images: string[];
+  profiles?: {
+    full_name: string;
+  };
+}
 
 @Component({
   selector: 'app-blog',
@@ -8,4 +25,34 @@ import { CommonModule } from '@angular/common';
   templateUrl: './blog.component.html',
   styleUrls: ['./blog.component.css']
 })
-export class BlogComponent {} 
+export class BlogComponent implements OnInit {
+  blogs: Blog[] = [];
+  loading = false;
+  error: string | null = null;
+
+  constructor(
+    private supabaseService: SupabaseService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.loadBlogs();
+  }
+
+  async loadBlogs() {
+    try {
+      this.loading = true;
+      this.error = null;
+      this.blogs = await this.supabaseService.getAllBlogs();
+    } catch (error: any) {
+      this.error = error.message;
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  navigateToBlogDetail(blogId: string) {
+    // Blog detay sayfası oluşturulduğunda burası güncellenecek
+    console.log('Blog detayına git:', blogId);
+  }
+} 
