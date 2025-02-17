@@ -4,6 +4,11 @@
       <span class="material-icons">close</span>
     </button>
 
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="error">
+      {{error}}
+    </div>
+
     <div class="tabs">
       <button [class.active]="activeTab === 'login'" (click)="activeTab = 'login'">
         <span class="material-icons">login</span>
@@ -16,41 +21,73 @@
     </div>
 
     <div class="auth-container">
-      <form class="auth-form" *ngIf="activeTab === 'login'">
+      <!-- Login Form -->
+      <form class="auth-form" *ngIf="activeTab === 'login'" (ngSubmit)="handleLogin()">
         <div class="form-group">
           <label>Email</label>
-          <input type="email" placeholder="Email adresinizi girin">
+          <input 
+            type="email" 
+            [(ngModel)]="loginForm.email" 
+            name="email"
+            placeholder="Email adresinizi girin"
+            required>
         </div>
         <div class="form-group">
           <label>Şifre</label>
-          <input type="password" placeholder="Şifrenizi girin">
+          <input 
+            type="password" 
+            [(ngModel)]="loginForm.password" 
+            name="password"
+            placeholder="Şifrenizi girin"
+            required>
         </div>
-        <button class="submit-btn">
+        <button type="submit" class="submit-btn" [disabled]="loading">
           <span class="material-icons">login</span>
-          Giriş Yap
+          {{loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}}
         </button>
       </form>
 
-      <form class="auth-form" *ngIf="activeTab === 'register'">
+      <!-- Register Form -->
+      <form class="auth-form" *ngIf="activeTab === 'register'" (ngSubmit)="handleRegister()">
         <div class="form-group">
           <label>Ad Soyad</label>
-          <input type="text" placeholder="Adınızı ve soyadınızı girin">
+          <input 
+            type="text" 
+            [(ngModel)]="registerForm.fullName" 
+            name="fullName"
+            placeholder="Adınızı ve soyadınızı girin"
+            required>
         </div>
         <div class="form-group">
           <label>Email</label>
-          <input type="email" placeholder="Email adresinizi girin">
+          <input 
+            type="email" 
+            [(ngModel)]="registerForm.email" 
+            name="email"
+            placeholder="Email adresinizi girin"
+            required>
         </div>
         <div class="form-group">
           <label>Şifre</label>
-          <input type="password" placeholder="Şifrenizi girin">
+          <input 
+            type="password" 
+            [(ngModel)]="registerForm.password" 
+            name="password"
+            placeholder="Şifrenizi girin"
+            required>
         </div>
         <div class="form-group">
           <label>Şifre Tekrar</label>
-          <input type="password" placeholder="Şifrenizi tekrar girin">
+          <input 
+            type="password" 
+            [(ngModel)]="registerForm.confirmPassword" 
+            name="confirmPassword"
+            placeholder="Şifrenizi tekrar girin"
+            required>
         </div>
-        <button class="submit-btn">
+        <button type="submit" class="submit-btn" [disabled]="loading">
           <span class="material-icons">person_add</span>
-          Kayıt Ol
+          {{loading ? 'Kayıt Yapılıyor...' : 'Kayıt Ol'}}
         </button>
       </form>
     </div>

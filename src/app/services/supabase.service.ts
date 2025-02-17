@@ -1,9 +1,156 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
+import { BehaviorSubject } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { isPlatformBrowser } from '@angular/common';
+
+interface Profile {
+  id: string;
+  full_name: string;
+  avatar_url?: string;
+  created_at: string;
+  updated_at: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupabaseService {
+  private supabase?: SupabaseClient;
+  private currentUser = new BehaviorSubject<User | null>(null);
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser: boolean;
 
-  constructor() { }
+  constructor() {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+    
+    if (this.isBrowser) {
+      this.initSupabase();
+    }
+  }
+
+  private initSupabase() {
+    if (!this.isBrowser) return;
+
+    this.supabase = createClient(
+      environment.supabaseUrl,
+      environment.supabaseKey
+    );
+
+    // Mevcut oturumu kontrol et
+    this.supabase.auth.getSession().then(({ data: { session } }) => {
+      this.currentUser.next(session?.user ?? null);
+    });
+
+    // Auth state değişikliklerini dinle
+    this.supabase.auth.onAuthStateChange((_event, session) => {
+      this.currentUser.next(session?.user ?? null);
+    });
+  }
+
+  get currentUserValue() {
+    return this.currentUser.value;
+  }
+
+  get currentUser$() {
+    return this.currentUser.asObservable();
+  }
+
+  private ensureSupabaseInitialized() {
+    if (!this.isBrowser) {
+      throw new Error('Bu işlem sadece tarayıcıda kullanılabilir');
+    }
+    if (!this.supabase) {
+      this.initSupabase();
+    }
+    if (!this.supabase) {
+      throw new Error('Supabase başlatılamadı');
+    }
+    return this.supabase;
+  }
+
+  async signUp(email: string, password: string, fullName: string) {
+    const supabase = this.ensureSupabaseInitialized();
+
+    try {
+      // Auth kaydı oluştur
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password
+      });
+      
+      if (authError) throw authError;
+
+      if (authData.user) {
+        // Profil oluştur
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            full_name: fullName
+          });
+
+        if (profileError) {
+          console.error('Profil oluşturma hatası:', profileError);
+          throw profileError;
+        }
+      }
+
+      return authData;
+    } catch (error) {
+      console.error('SignUp hatası:', error);
+      throw error;
+    }
+  }
+
+  async signIn(email: string, password: string) {
+    const supabase = this.ensureSupabaseInitialized();
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async signOut() {
+    const supabase = this.ensureSupabaseInitialized();
+
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  }
+
+  async resetPassword(email: string) {
+    const supabase = this.ensureSupabaseInitialized();
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) throw error;
+    return data;
+  }
+
+  async getProfile(userId: string) {
+    const supabase = this.ensureSupabaseInitialized();
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error) throw error;
+    return data as Profile;
+  }
+
+  async updateProfile(profile: Partial<Profile>) {
+    const supabase = this.ensureSupabaseInitialized();
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(profile)
+      .eq('id', this.currentUserValue?.id);
+
+    if (error) throw error;
+    return data;
+  }
 }
