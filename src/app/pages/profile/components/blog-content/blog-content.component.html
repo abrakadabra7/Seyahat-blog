@@ -1,0 +1,98 @@
+<div class="profile-main">
+  <!-- Hata Mesajı -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div class="blog-header">
+    <h2 class="section-title">Bloglarım</h2>
+    <button class="add-blog-btn" (click)="showBlogForm = true" *ngIf="!showBlogForm">
+      <span class="material-icons">add</span>
+      Yeni Blog Ekle
+    </button>
+  </div>
+
+  <!-- Blog Ekleme Formu -->
+  <div class="blog-form" *ngIf="showBlogForm">
+    <h3>Yeni Blog Ekle</h3>
+    <form (ngSubmit)="addBlog()" #blogForm="ngForm">
+      <div class="form-group">
+        <label>Başlık</label>
+        <input type="text" [(ngModel)]="newBlog.title" name="title" required>
+      </div>
+
+      <div class="form-group">
+        <label>Kategori</label>
+        <select [(ngModel)]="newBlog.category" name="category" required>
+          <option value="">Kategori Seçin</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{category}}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>İçerik</label>
+        <textarea [(ngModel)]="newBlog.content" name="content" rows="6" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Fotoğraflar</label>
+        <div class="file-upload-container">
+          <div class="upload-button">
+            <span class="material-icons">add_photo_alternate</span>
+            <span>Fotoğraf Seç</span>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" multiple>
+          </div>
+          <small class="upload-info">Birden fazla fotoğraf seçebilirsiniz. İlk fotoğraf kapak fotoğrafı olarak kullanılacaktır.</small>
+        </div>
+        
+        <div class="image-previews" *ngIf="imagePreviews.length > 0">
+          <div class="preview-item" *ngFor="let preview of imagePreviews; let i = index">
+            <img [src]="preview" [alt]="'Preview ' + (i + 1)">
+            <div class="preview-overlay">
+              <span class="preview-number" *ngIf="i === 0">Kapak Fotoğrafı</span>
+              <button class="remove-image" (click)="removeImage(i)" title="Fotoğrafı Kaldır">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="showBlogForm = false">
+          İptal
+        </button>
+        <button type="submit" class="submit-btn" [disabled]="blogForm.invalid || isSubmitting">
+          {{ isSubmitting ? 'Kaydediliyor...' : 'Blog Ekle' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Blog Listesi -->
+  <div class="blog-list" *ngIf="!showBlogForm">
+    <div class="blog-card" *ngFor="let blog of blogs">
+      <div class="blog-image" *ngIf="blog.image_url">
+        <img [src]="blog.image_url" [alt]="blog.title">
+      </div>
+      <div class="blog-content">
+        <span class="blog-category">{{blog.category}}</span>
+        <h3>{{blog.title}}</h3>
+        <p>{{blog.content | slice:0:150}}...</p>
+        <div class="blog-footer">
+          <span class="blog-date">{{blog.created_at | date:'mediumDate'}}</span>
+          <div class="blog-actions">
+            <button class="action-btn edit" (click)="editBlog(blog)">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="action-btn delete" (click)="deleteBlog(blog.id)">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

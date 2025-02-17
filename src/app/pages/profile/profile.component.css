@@ -147,81 +147,34 @@
   color: #666;
 }
 
-/* Sağ Panel - Blog İçeriği İçin */
-.profile-main {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-  min-height: 500px;
-}
-
-.section-title {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
-}
-
-/* Responsive Tasarım */
-@media (max-width: 1024px) {
+@media (max-width: 992px) {
   .profile-container {
     grid-template-columns: 1fr;
-  }
-
-  .profile-sidebar {
-    max-width: 600px;
-    margin: 0 auto;
+    gap: 2rem;
   }
 }
 
 @media (max-width: 768px) {
   .profile-hero {
-    height: 30vh;
+    height: 40vh;
   }
 
   .hero-content h1 {
     font-size: 2.5rem;
   }
 
-  .hero-content p {
-    font-size: 1rem;
-  }
-
   .profile-content {
     margin-top: -3rem;
-    padding: 0 1rem 3rem 1rem;
-  }
-
-  .profile-container {
-    gap: 1.5rem;
-  }
-
-  .avatar {
-    width: 100px;
-    height: 100px;
-  }
-
-  .avatar .material-icons {
-    font-size: 3rem;
+    padding: 0 1rem 2rem;
   }
 }
 
 @media (max-width: 576px) {
-  .profile-hero {
-    height: 25vh;
-  }
-
   .hero-content h1 {
     font-size: 2rem;
   }
 
-  .profile-content {
-    margin-top: -2rem;
-  }
-
-  .profile-sidebar, .profile-main {
+  .profile-sidebar {
     padding: 1.5rem;
   }
 } 

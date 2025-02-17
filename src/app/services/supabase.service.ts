@@ -12,6 +12,18 @@ interface Profile {
   updated_at: string;
 }
 
+interface Blog {
+  id?: string;
+  user_id: string;
+  title: string;
+  content: string;
+  image_url?: string;
+  category: string;
+  created_at?: string;
+  updated_at?: string;
+  images: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -67,6 +79,66 @@ export class SupabaseService {
       throw new Error('Supabase başlatılamadı');
     }
     return this.supabase;
+  }
+
+  // Blog işlemleri için yeni metodlar
+  async getBlogs(userId: string) {
+    const supabase = this.ensureSupabaseInitialized();
+    const { data, error } = await supabase
+      .from('blogs')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as Blog[];
+  }
+
+  async addBlog(blog: Blog, file: File): Promise<Blog> {
+    const supabase = this.ensureSupabaseInitialized();
+    try {
+      if (file) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const currentUser = this.currentUser.value;
+        if (!currentUser) throw new Error('Kullanıcı oturum açmamış');
+        
+        const filePath = `${currentUser.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('blog-images')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('blog-images')
+          .getPublicUrl(filePath);
+
+        blog.image_url = publicUrl;
+      }
+
+      const { data, error } = await supabase
+        .from('blogs')
+        .insert(blog)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  async deleteBlog(id: string) {
+    const supabase = this.ensureSupabaseInitialized();
+    const { error } = await supabase
+      .from('blogs')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
   }
 
   async signUp(email: string, password: string, fullName: string) {

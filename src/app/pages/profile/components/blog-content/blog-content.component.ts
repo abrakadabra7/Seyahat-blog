@@ -1,17 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SupabaseService } from '../../services/supabase.service';
+import { SupabaseService } from '../../../../services/supabase.service';
 import { User } from '@supabase/supabase-js';
-import { BlogContentComponent } from './components/blog-content/blog-content.component';
-
-interface Profile {
-  id: string;
-  full_name: string;
-  avatar_url?: string;
-  created_at: string;
-  updated_at: string;
-}
 
 interface Blog {
   id?: string;
@@ -26,24 +17,21 @@ interface Blog {
 }
 
 @Component({
-  selector: 'app-profile',
+  selector: 'app-blog-content',
   standalone: true,
-  imports: [CommonModule, FormsModule, BlogContentComponent],
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css']
+  imports: [CommonModule, FormsModule],
+  templateUrl: './blog-content.component.html',
+  styleUrls: ['./blog-content.component.css']
 })
-export class ProfileComponent implements OnInit {
-  currentUser: User | null = null;
-  profile: Profile | null = null;
-  loading = false;
-  error: string | null = null;
+export class BlogContentComponent implements OnChanges {
+  @Input() currentUser: User | null = null;
   
-  // Blog ile ilgili değişkenler
   showBlogForm = false;
   isSubmitting = false;
   imagePreviews: string[] = [];
   selectedFiles: File[] = [];
   blogs: Blog[] = [];
+  error: string | null = null;
   
   newBlog: Blog = {
     user_id: '',
@@ -64,57 +52,15 @@ export class ProfileComponent implements OnInit {
     'Sanat'
   ];
 
-  constructor(private supabaseService: SupabaseService) {
-    this.supabaseService.currentUser$.subscribe(user => {
-      this.currentUser = user;
-      if (user) {
-        this.loadProfile();
-        this.loadBlogs();
-        this.newBlog.user_id = user.id;
-      }
-    });
-  }
+  constructor(private supabaseService: SupabaseService) {}
 
-  ngOnInit() {
-    if (this.currentUser) {
-      this.loadProfile();
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['currentUser'] && this.currentUser) {
       this.loadBlogs();
+      this.newBlog.user_id = this.currentUser.id;
     }
   }
 
-  async loadProfile() {
-    try {
-      this.loading = true;
-      this.error = null;
-      this.profile = await this.supabaseService.getProfile(this.currentUser!.id);
-    } catch (error: any) {
-      this.error = error.message;
-    } finally {
-      this.loading = false;
-    }
-  }
-
-  async updateProfile(fullName: string) {
-    try {
-      this.loading = true;
-      this.error = null;
-      
-      if (!this.profile) return;
-
-      await this.supabaseService.updateProfile({
-        id: this.profile.id,
-        full_name: fullName
-      });
-
-      await this.loadProfile();
-    } catch (error: any) {
-      this.error = error.message;
-    } finally {
-      this.loading = false;
-    }
-  }
-
-  // Blog işlemleri
   async loadBlogs() {
     try {
       if (!this.currentUser) return;
@@ -129,14 +75,14 @@ export class ProfileComponent implements OnInit {
     if (files && files.length > 0) {
       // Dosya boyutu kontrolü (her dosya için maksimum 5MB)
       const fileArray = Array.from(files) as File[];
-      const invalidFiles = fileArray.filter(file => file.size > 5 * 1024 * 1024);
+      const invalidFiles = fileArray.filter((file: File) => file.size > 5 * 1024 * 1024);
       if (invalidFiles.length > 0) {
         this.error = 'Bazı dosyalar çok büyük. Maksimum dosya boyutu 5MB olmalıdır.';
         return;
       }
 
       // Dosya tipi kontrolü
-      const invalidTypes = fileArray.filter(file => !file.type.startsWith('image/'));
+      const invalidTypes = fileArray.filter((file: File) => !file.type.startsWith('image/'));
       if (invalidTypes.length > 0) {
         this.error = 'Sadece resim dosyaları yükleyebilirsiniz.';
         return;
