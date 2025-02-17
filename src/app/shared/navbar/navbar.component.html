@@ -1,7 +1,6 @@
 <nav class="navbar" [class.scrolled]="isScrolled">
   <div class="logo">
     <a routerLink="/"><img src="./assets/images/logo.png" alt="Logo"></a>
-    
   </div>
 
   <div class="nav-links">
@@ -15,9 +14,22 @@
     <button class="search-btn">
       <span class="material-icons">search</span>
     </button>
-    <button class="profile-btn" (click)="openAuthModal()">
+    
+    <!-- Giriş yapılmamışsa -->
+    <button *ngIf="!currentUser" class="auth-btn" (click)="openAuthModal()">
       <span class="material-icons">person</span>
     </button>
+
+    <!-- Giriş yapılmışsa -->
+    <div *ngIf="currentUser" class="auth-buttons">
+      <button class="auth-btn" (click)="navigateToProfile()">
+        <span class="material-icons">person</span>
+      </button>
+      <button class="auth-btn" (click)="handleLogout()">
+        <span class="material-icons">logout</span>
+      </button>
+    </div>
+
     <button class="explore-btn">Explore Now</button>
   </div>
 </nav>

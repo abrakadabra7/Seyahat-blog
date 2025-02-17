@@ -1,0 +1,227 @@
+.profile-hero {
+  height: 60vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('/assets/images/profile-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  padding: 0 2rem;
+}
+
+.hero-content {
+  max-width: 800px;
+}
+
+.hero-content h1 {
+  font-size: 3.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.hero-content p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.profile-content {
+  margin-top: -5rem;
+  padding: 0 2rem 4rem 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+  margin-top: 7rem;
+}
+
+/* Sol Panel - Profil Bilgileri */
+.profile-sidebar {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  height: fit-content;
+}
+
+.error-message {
+  background-color: #fee;
+  color: #e33;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #eee;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.avatar .material-icons {
+  font-size: 4rem;
+  color: #666;
+}
+
+.user-info h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.user-info p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.profile-details {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-item label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-item input {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+}
+
+.detail-item input:focus {
+  outline: none;
+  border-color: #333;
+  box-shadow: 0 0 0 3px rgba(51, 51, 51, 0.1);
+  background-color: white;
+}
+
+.detail-item input:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  color: #666;
+}
+
+/* Sağ Panel - Blog İçeriği İçin */
+.profile-main {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  min-height: 500px;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 1024px) {
+  .profile-container {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-sidebar {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-hero {
+    height: 30vh;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .profile-content {
+    margin-top: -3rem;
+    padding: 0 1rem 3rem 1rem;
+  }
+
+  .profile-container {
+    gap: 1.5rem;
+  }
+
+  .avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .avatar .material-icons {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .profile-hero {
+    height: 25vh;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .profile-content {
+    margin-top: -2rem;
+  }
+
+  .profile-sidebar, .profile-main {
+    padding: 1.5rem;
+  }
+} 

@@ -2,6 +2,8 @@ import { Component, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
+import { SupabaseService } from '../../services/supabase.service';
+import { User } from '@supabase/supabase-js';
 
 @Component({
   selector: 'app-navbar',
@@ -13,8 +15,17 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 export class NavbarComponent {
   isScrolled = false;
   @ViewChild('authModal') authModal!: AuthModalComponent;
+  currentUser: User | null = null;
 
-  constructor(private router: Router) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private router: Router
+  ) {
+    // Kullanıcı durumunu takip et
+    this.supabaseService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+  }
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -25,7 +36,16 @@ export class NavbarComponent {
     this.authModal.openModal();
   }
 
-  navigateToContact() {
-    this.router.navigate(['/contact']);
+  async handleLogout() {
+    try {
+      await this.supabaseService.signOut();
+      this.router.navigate(['/']);
+    } catch (error) {
+      console.error('Çıkış yapılırken hata oluştu:', error);
+    }
+  }
+
+  navigateToProfile() {
+    this.router.navigate(['/profile']);
   }
 }

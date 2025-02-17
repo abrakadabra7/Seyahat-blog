@@ -1,0 +1,62 @@
+<section class="profile-hero">
+  <div class="hero-content">
+    <h1>Profilim</h1>
+    <p>Hesap bilgilerinizi yönetin ve bloglarınızı paylaşın</p>
+  </div>
+</section>
+
+<section class="profile-content">
+  <div class="profile-container">
+    <!-- Sol Panel - Profil Bilgileri -->
+    <div class="profile-sidebar">
+      <!-- Hata Mesajı -->
+      <div *ngIf="error" class="error-message">
+        {{ error }}
+      </div>
+
+      <!-- Yükleniyor -->
+      <div *ngIf="loading" class="loading">
+        <span class="material-icons">sync</span>
+        Yükleniyor...
+      </div>
+
+      <!-- Profil Bilgileri -->
+      <div *ngIf="profile && !loading" class="profile-info">
+        <div class="profile-header">
+          <div class="avatar">
+            <span class="material-icons">account_circle</span>
+          </div>
+          <div class="user-info">
+            <h2>{{ profile.full_name }}</h2>
+            <p>{{ currentUser?.email }}</p>
+          </div>
+        </div>
+
+        <div class="profile-details">
+          <div class="detail-item">
+            <label>Ad Soyad</label>
+            <input type="text" [(ngModel)]="profile.full_name" 
+                   placeholder="Ad Soyad" 
+                   (blur)="updateProfile(profile.full_name)">
+          </div>
+
+          <div class="detail-item">
+            <label>Email</label>
+            <input type="email" [value]="currentUser?.email" disabled>
+          </div>
+
+          <div class="detail-item">
+            <label>Üyelik Tarihi</label>
+            <input type="text" [value]="profile.created_at | date:'mediumDate'" disabled>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sağ Panel - Blog İçeriği -->
+    <div class="profile-main">
+      <h2 class="section-title">Bloglarım</h2>
+      <!-- Blog içeriği buraya gelecek -->
+    </div>
+  </div>
+</section> 

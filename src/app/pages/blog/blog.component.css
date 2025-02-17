@@ -1,0 +1,60 @@
+.blog-hero {
+  height: 90vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('/assets/images/blogpage-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  padding: 0 2rem;
+}
+
+.hero-content {
+  max-width: 800px;
+}
+
+.hero-content h1 {
+  font-size: 4rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.blog-content {
+  padding: 6rem 2rem;
+  background-color: #fff;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 768px) {
+  .blog-hero {
+    height: 60vh;
+  }
+
+  .hero-content h1 {
+    font-size: 3rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .blog-content {
+    padding: 4rem 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+} 
