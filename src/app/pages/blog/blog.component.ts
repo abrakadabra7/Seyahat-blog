@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SupabaseService } from '../../services/supabase.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 interface Blog {
   id?: string;
@@ -21,7 +21,7 @@ interface Blog {
 @Component({
   selector: 'app-blog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './blog.component.html',
   styleUrls: ['./blog.component.css']
 })
@@ -51,8 +51,19 @@ export class BlogComponent implements OnInit {
     }
   }
 
-  navigateToBlogDetail(blogId: string) {
-    // Blog detay sayfası oluşturulduğunda burası güncellenecek
-    console.log('Blog detayına git:', blogId);
+  navigateToBlogDetail(blogId: string | undefined) {
+    if (blogId) {
+      this.router.navigate(['/blog', blogId]);
+    }
+  }
+
+  navigateToCategory(category: string) {
+    // TODO: Kategori sayfası oluşturulduğunda güncellenecek
+    console.log('Kategoriye git:', category);
+  }
+
+  navigateToAuthor(authorId: string) {
+    // TODO: Yazar profil sayfası oluşturulduğunda güncellenecek
+    console.log('Yazara git:', authorId);
   }
 } 

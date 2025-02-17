@@ -262,4 +262,36 @@ export class SupabaseService {
     if (error) throw error;
     return data;
   }
+
+  async getBlogById(id: string) {
+    const supabase = this.ensureSupabaseInitialized();
+    
+    try {
+      // Blog bilgilerini getir
+      const { data: blog, error: blogError } = await supabase
+        .from('blogs')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (blogError) throw blogError;
+      if (!blog) throw new Error('Blog bulunamadı');
+
+      // Yazar bilgilerini getir
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', blog.user_id)
+        .single();
+
+      if (profileError) {
+        console.error('Profil getirme hatası:', profileError);
+        return { ...blog, profiles: { full_name: 'Anonim' } };
+      }
+
+      return { ...blog, profiles: profile };
+    } catch (error) {
+      throw error;
+    }
+  }
 }

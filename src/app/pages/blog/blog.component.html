@@ -20,15 +20,15 @@
   <!-- Blog Listesi -->
   <div class="blog-list" *ngIf="!loading">
     <article class="blog-item" *ngFor="let blog of blogs">
-      <div class="blog-category">
+      <div class="blog-category" (click)="navigateToCategory(blog.category)">
         {{blog.category}}
       </div>
       
-      <h2 class="blog-title">
+      <h2 class="blog-title" (click)="navigateToBlogDetail(blog.id)">
         {{blog.title}}
       </h2>
       
-      <div class="blog-image">
+      <div class="blog-image" (click)="navigateToBlogDetail(blog.id)">
         <img [src]="blog.image_url" [alt]="blog.title">
       </div>
       
@@ -37,7 +37,7 @@
       </p>
       
       <div class="blog-meta">
-        <div class="author-info">
+        <div class="author-info" (click)="navigateToAuthor(blog.user_id)">
           <img src="assets/images/avatar.jpg" [alt]="blog.profiles?.full_name">
           <span class="author">{{blog.profiles?.full_name}}</span>
         </div>
