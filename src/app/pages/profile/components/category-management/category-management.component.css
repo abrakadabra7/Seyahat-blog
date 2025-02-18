@@ -1,0 +1,96 @@
+.category-management {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+  max-width: 800px;
+}
+
+h3 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.category-form {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+input {
+  flex: 1;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: #218838;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #dc3545;
+  margin-bottom: 1rem;
+}
+
+.categories-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.delete-btn {
+  background: #dc3545;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+}
+
+/* Mobil Uyumluluk */
+@media (max-width: 768px) {
+  .category-management {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .category-form {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+    justify-content: center;
+  }
+} 

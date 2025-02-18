@@ -32,6 +32,7 @@ export class BlogContentComponent implements OnChanges {
   selectedFiles: File[] = [];
   blogs: Blog[] = [];
   error: string | null = null;
+  categories: string[] = [];
   
   newBlog: Blog = {
     user_id: '',
@@ -41,22 +42,12 @@ export class BlogContentComponent implements OnChanges {
     images: []
   };
 
-  categories = [
-    'Seyahat',
-    'Yemek',
-    'Kültür',
-    'Macera',
-    'Doğa',
-    'Şehir Hayatı',
-    'Tarih',
-    'Sanat'
-  ];
-
   constructor(private supabaseService: SupabaseService) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['currentUser'] && this.currentUser) {
       this.loadBlogs();
+      this.loadCategories();
       this.newBlog.user_id = this.currentUser.id;
     }
   }
@@ -65,6 +56,15 @@ export class BlogContentComponent implements OnChanges {
     try {
       if (!this.currentUser) return;
       this.blogs = await this.supabaseService.getBlogs(this.currentUser.id);
+    } catch (error: any) {
+      this.error = error.message;
+    }
+  }
+
+  async loadCategories() {
+    try {
+      const categories = await this.supabaseService.getCategories();
+      this.categories = categories.map(cat => cat.name);
     } catch (error: any) {
       this.error = error.message;
     }

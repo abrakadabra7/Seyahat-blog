@@ -29,6 +29,7 @@
           <div class="user-info">
             <h2>{{ profile.full_name }}</h2>
             <p>{{ currentUser?.email }}</p>
+            <span class="admin-badge" *ngIf="isAdmin">Admin</span>
           </div>
         </div>
 
@@ -56,6 +57,15 @@
     <!-- Sağ Panel - Blog İçeriği -->
     <app-blog-content [currentUser]="currentUser"></app-blog-content>
   </div>
+</section>
+
+<!-- Admin Paneli -->
+<section class="admin-panel" *ngIf="isAdmin">
+  <div class="admin-header">
+    <h2>Admin Paneli</h2>
+    <p>Kategori yönetimi ve diğer admin işlemleri için bu paneli kullanabilirsiniz.</p>
+  </div>
+  <app-category-management></app-category-management>
 </section>
 
 <!-- Okunan Bloglar Bölümü -->

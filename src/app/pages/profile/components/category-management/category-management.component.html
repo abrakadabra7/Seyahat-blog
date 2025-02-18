@@ -1,0 +1,30 @@
+<div class="category-management" *ngIf="isAdmin">
+  <h3>Kategori Yönetimi</h3>
+  
+  <!-- Kategori Ekleme Formu -->
+  <div class="category-form">
+    <input type="text" [(ngModel)]="newCategoryName" 
+           placeholder="Yeni kategori adı" 
+           [disabled]="loading">
+    <button (click)="addCategory()" 
+            [disabled]="!newCategoryName || loading">
+      <span class="material-icons">add</span>
+      Ekle
+    </button>
+  </div>
+
+  <!-- Hata Mesajı -->
+  <div class="error-message" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <!-- Kategoriler Listesi -->
+  <div class="categories-list">
+    <div class="category-item" *ngFor="let category of categories">
+      <span>{{ category.name }}</span>
+      <button class="delete-btn" (click)="deleteCategory(category.id)">
+        <span class="material-icons">delete</span>
+      </button>
+    </div>
+  </div>
+</div> 

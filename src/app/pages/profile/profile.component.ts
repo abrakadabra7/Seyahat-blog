@@ -5,6 +5,7 @@ import { SupabaseService } from '../../services/supabase.service';
 import { User } from '@supabase/supabase-js';
 import { BlogContentComponent } from './components/blog-content/blog-content.component';
 import { ReadBlogsComponent } from './components/read-blogs/read-blogs.component';
+import { CategoryManagementComponent } from './components/category-management/category-management.component';
 
 interface Profile {
   id: string;
@@ -29,7 +30,13 @@ interface Blog {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, BlogContentComponent, ReadBlogsComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    BlogContentComponent,
+    ReadBlogsComponent,
+    CategoryManagementComponent
+  ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
@@ -38,6 +45,7 @@ export class ProfileComponent implements OnInit {
   profile: Profile | null = null;
   loading = false;
   error: string | null = null;
+  isAdmin = false;
   
   // Blog ile ilgili değişkenler
   showBlogForm = false;
@@ -70,6 +78,7 @@ export class ProfileComponent implements OnInit {
       this.currentUser = user;
       if (user) {
         this.loadProfile();
+        this.checkAdminStatus();
         this.loadBlogs();
         this.newBlog.user_id = user.id;
       }
@@ -226,5 +235,13 @@ export class ProfileComponent implements OnInit {
     this.imagePreviews = [];
     this.showBlogForm = false;
     this.error = null;
+  }
+
+  async checkAdminStatus() {
+    try {
+      this.isAdmin = await this.supabaseService.isAdmin();
+    } catch (error) {
+      console.error('Admin durumu kontrol edilirken hata oluştu:', error);
+    }
   }
 } 

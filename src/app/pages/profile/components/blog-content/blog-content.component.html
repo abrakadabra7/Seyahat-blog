@@ -29,6 +29,9 @@
             {{category}}
           </option>
         </select>
+        <div class="no-categories" *ngIf="categories.length === 0">
+          <p>Henüz kategori bulunmuyor. Admin panelinden kategori ekleyebilirsiniz.</p>
+        </div>
       </div>
 
       <div class="form-group">

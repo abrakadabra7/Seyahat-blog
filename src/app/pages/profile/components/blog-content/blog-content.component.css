@@ -382,4 +382,27 @@
   .cancel-btn, .submit-btn {
     width: 100%;
   }
+}
+
+.form-group select {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  width: 100%;
+  background-color: white;
+}
+
+.no-categories {
+  margin-top: 0.5rem;
+  padding: 0.8rem;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 6px;
+  color: #856404;
+}
+
+.no-categories p {
+  margin: 0;
+  font-size: 0.9rem;
 } 
