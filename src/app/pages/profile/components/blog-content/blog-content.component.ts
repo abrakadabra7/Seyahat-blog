@@ -1,9 +1,9 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../../services/supabase.service';
 import { CategoryService } from '../../../../services/category.service';
-import { User } from '@supabase/supabase-js';
+import { AuthService } from '../../../../services/auth.service';
 
 interface Blog {
   id?: string;
@@ -24,9 +24,7 @@ interface Blog {
   templateUrl: './blog-content.component.html',
   styleUrls: ['./blog-content.component.css']
 })
-export class BlogContentComponent implements OnChanges {
-  @Input() currentUser: User | null = null;
-  
+export class BlogContentComponent implements OnInit {
   showBlogForm = false;
   isSubmitting = false;
   imagePreviews: string[] = [];
@@ -45,21 +43,24 @@ export class BlogContentComponent implements OnChanges {
 
   constructor(
     private supabaseService: SupabaseService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private authService: AuthService
   ) {}
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['currentUser'] && this.currentUser) {
+  ngOnInit() {
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser) {
       this.loadBlogs();
       this.loadCategories();
-      this.newBlog.user_id = this.currentUser.id;
+      this.newBlog.user_id = currentUser.id;
     }
   }
 
   async loadBlogs() {
     try {
-      if (!this.currentUser) return;
-      this.blogs = await this.supabaseService.getBlogs(this.currentUser.id);
+      const currentUser = this.authService.currentUserValue;
+      if (!currentUser) return;
+      this.blogs = await this.supabaseService.getBlogs(currentUser.id);
     } catch (error: any) {
       this.error = error.message;
     }
@@ -112,7 +113,8 @@ export class BlogContentComponent implements OnChanges {
   }
 
   async addBlog() {
-    if (!this.currentUser) return;
+    const currentUser = this.authService.currentUserValue;
+    if (!currentUser) return;
 
     try {
       this.isSubmitting = true;
@@ -177,8 +179,9 @@ export class BlogContentComponent implements OnChanges {
   }
 
   resetForm() {
+    const currentUser = this.authService.currentUserValue;
     this.newBlog = {
-      user_id: this.currentUser!.id,
+      user_id: currentUser ? currentUser.id : '',
       title: '',
       content: '',
       category: '',

@@ -1,12 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SupabaseService } from '../../services/supabase.service';
-import { ProfileService, Profile } from '../../services/profile.service';
 import { User } from '@supabase/supabase-js';
+import { SupabaseService } from '../../services/supabase.service';
+import { ProfileService } from '../../services/profile.service';
+import { AuthService } from '../../services/auth.service';
 import { BlogContentComponent } from './components/blog-content/blog-content.component';
-import { ReadBlogsComponent } from './components/read-blogs/read-blogs.component';
 import { CategoryManagementComponent } from './components/category-management/category-management.component';
+import { ReadBlogsComponent } from './components/read-blogs/read-blogs.component';
+
+interface Profile {
+  id: string;
+  full_name: string;
+  avatar_url?: string;
+  created_at: string;
+  updated_at: string;
+}
 
 interface Blog {
   id?: string;
@@ -27,8 +36,8 @@ interface Blog {
     CommonModule,
     FormsModule,
     BlogContentComponent,
-    ReadBlogsComponent,
-    CategoryManagementComponent
+    CategoryManagementComponent,
+    ReadBlogsComponent
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
@@ -68,16 +77,14 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private supabaseService: SupabaseService,
-    private profileService: ProfileService
+    private profileService: ProfileService,
+    private authService: AuthService
   ) {
-    // Kullanıcı durumunu takip et
-    this.supabaseService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       if (user) {
         this.loadProfile();
         this.checkAdminStatus();
-        this.loadBlogs();
-        this.newBlog.user_id = user.id;
       }
     });
   }
@@ -85,7 +92,7 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
     if (this.currentUser) {
       this.loadProfile();
-      this.loadBlogs();
+      this.checkAdminStatus();
     }
   }
 
@@ -94,7 +101,7 @@ export class ProfileComponent implements OnInit {
       this.loading = true;
       this.error = null;
       if (!this.currentUser) return;
-      
+
       this.profile = await this.profileService.getProfile(this.currentUser.id);
     } catch (error: any) {
       this.error = error.message;
@@ -104,15 +111,15 @@ export class ProfileComponent implements OnInit {
   }
 
   async updateProfile(fullName: string) {
-    if (!this.currentUser || !this.profile) return;
-
     try {
       this.loading = true;
       this.error = null;
+      if (!this.currentUser || !this.profile) return;
 
       await this.profileService.updateProfile({
         id: this.currentUser.id,
-        full_name: fullName
+        full_name: fullName,
+        updated_at: new Date().toISOString()
       });
 
       this.profile.full_name = fullName;
@@ -238,7 +245,7 @@ export class ProfileComponent implements OnInit {
 
   async checkAdminStatus() {
     try {
-      this.isAdmin = await this.profileService.isAdmin();
+      this.isAdmin = await this.supabaseService.isAdmin();
     } catch (error: any) {
       console.error('Admin kontrolü hatası:', error);
       this.isAdmin = false;

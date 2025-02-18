@@ -1,8 +1,8 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
-import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
+import { AuthService } from './auth.service';
 
 interface Profile {
   id: string;
@@ -43,11 +43,10 @@ interface Category {
 })
 export class SupabaseService {
   private supabase?: SupabaseClient;
-  private currentUser = new BehaviorSubject<User | null>(null);
   private platformId = inject(PLATFORM_ID);
   private isBrowser: boolean;
 
-  constructor() {
+  constructor(private authService: AuthService) {
     this.isBrowser = isPlatformBrowser(this.platformId);
     
     if (this.isBrowser) {
@@ -62,24 +61,6 @@ export class SupabaseService {
       environment.supabaseUrl,
       environment.supabaseKey
     );
-
-    // Mevcut oturumu kontrol et
-    this.supabase.auth.getSession().then(({ data: { session } }) => {
-      this.currentUser.next(session?.user ?? null);
-    });
-
-    // Auth state değişikliklerini dinle
-    this.supabase.auth.onAuthStateChange((_event, session) => {
-      this.currentUser.next(session?.user ?? null);
-    });
-  }
-
-  get currentUserValue() {
-    return this.currentUser.value;
-  }
-
-  get currentUser$() {
-    return this.currentUser.asObservable();
   }
 
   private ensureSupabaseInitialized() {
@@ -191,7 +172,7 @@ export class SupabaseService {
   async addBlog(blog: Blog, coverFile: File, additionalFiles?: File[]): Promise<Blog> {
     const supabase = this.ensureSupabaseInitialized();
     try {
-      const currentUser = this.currentUser.value;
+      const currentUser = this.authService.currentUserValue;
       if (!currentUser) throw new Error('Kullanıcı oturum açmamış');
 
       // Kapak fotoğrafını yükle
@@ -269,66 +250,6 @@ export class SupabaseService {
     if (error) throw error;
   }
 
-  async signUp(email: string, password: string, fullName: string) {
-    const supabase = this.ensureSupabaseInitialized();
-
-    try {
-      // Auth kaydı oluştur
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password
-      });
-      
-      if (authError) throw authError;
-
-      if (authData.user) {
-        // Profil oluştur
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            full_name: fullName
-          });
-
-        if (profileError) {
-          console.error('Profil oluşturma hatası:', profileError);
-          throw profileError;
-        }
-      }
-
-      return authData;
-    } catch (error) {
-      console.error('SignUp hatası:', error);
-      throw error;
-    }
-  }
-
-  async signIn(email: string, password: string) {
-    const supabase = this.ensureSupabaseInitialized();
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-    if (error) throw error;
-    return data;
-  }
-
-  async signOut() {
-    const supabase = this.ensureSupabaseInitialized();
-
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-  }
-
-  async resetPassword(email: string) {
-    const supabase = this.ensureSupabaseInitialized();
-
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
-    if (error) throw error;
-    return data;
-  }
-
   async getBlogById(id: string) {
     const supabase = this.ensureSupabaseInitialized();
     
@@ -382,7 +303,7 @@ export class SupabaseService {
   async getReadBlogs(): Promise<Blog[]> {
     try {
       const supabase = await this.ensureSupabaseInitialized();
-      const user = await this.currentUserValue;
+      const user = await this.authService.currentUserValue;
       
       if (!user) {
         throw new Error('Kullanıcı girişi yapılmamış');
@@ -455,7 +376,7 @@ export class SupabaseService {
       }
 
       const supabase = await this.ensureSupabaseInitialized();
-      const user = await this.currentUserValue;
+      const user = await this.authService.currentUserValue;
       
       if (!user) {
         throw new Error('Kullanıcı girişi yapılmamış');
@@ -501,7 +422,7 @@ export class SupabaseService {
 
   async isAdmin(): Promise<boolean> {
     try {
-      const user = await this.currentUserValue;
+      const user = await this.authService.currentUserValue;
       if (!user) return false;
       
       const { data: profile } = await this.supabase!

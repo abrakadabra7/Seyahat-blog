@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SupabaseService } from '../../../../services/supabase.service';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../../../services/auth.service';
 
 interface Blog {
   id?: string;
@@ -30,11 +31,14 @@ export class ReadBlogsComponent implements OnInit {
 
   constructor(
     private supabaseService: SupabaseService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    this.loadReadBlogs();
+    if (this.authService.currentUserValue) {
+      this.loadReadBlogs();
+    }
   }
 
   async loadReadBlogs() {

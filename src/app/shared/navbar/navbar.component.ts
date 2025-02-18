@@ -2,7 +2,7 @@ import { Component, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
-import { SupabaseService } from '../../services/supabase.service';
+import { AuthService } from '../../services/auth.service';
 import { User } from '@supabase/supabase-js';
 
 @Component({
@@ -18,11 +18,11 @@ export class NavbarComponent {
   currentUser: User | null = null;
 
   constructor(
-    private supabaseService: SupabaseService,
+    private authService: AuthService,
     private router: Router
   ) {
     // Kullanıcı durumunu takip et
-    this.supabaseService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });
   }
@@ -38,7 +38,7 @@ export class NavbarComponent {
 
   async handleLogout() {
     try {
-      await this.supabaseService.signOut();
+      await this.authService.signOut();
       this.router.navigate(['/']);
     } catch (error) {
       console.error('Çıkış yapılırken hata oluştu:', error);

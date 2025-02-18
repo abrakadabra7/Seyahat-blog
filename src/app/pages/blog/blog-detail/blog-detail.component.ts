@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
+import { AuthService } from '../../../services/auth.service';
 
 interface Blog {
   id?: string;
@@ -34,7 +35,8 @@ export class BlogDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private supabaseService: SupabaseService
+    private supabaseService: SupabaseService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -51,7 +53,7 @@ export class BlogDetailComponent implements OnInit {
       this.blog = await this.supabaseService.getBlogById(id);
 
       // Blog yüklendiğinde okundu olarak işaretle ve görüntülenme sayısını artır
-      if (this.blog && this.blog.id) {
+      if (this.blog && this.blog.id && this.authService.currentUserValue) {
         await Promise.all([
           this.supabaseService.markBlogAsRead(this.blog.id),
           this.supabaseService.incrementBlogViewCount(this.blog.id)

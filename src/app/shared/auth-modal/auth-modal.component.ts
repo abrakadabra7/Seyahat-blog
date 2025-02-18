@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SupabaseService } from '../../services/supabase.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-auth-modal',
@@ -28,7 +28,7 @@ export class AuthModalComponent {
     confirmPassword: ''
   };
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(private authService: AuthService) {}
 
   openModal() {
     this.isVisible = true;
@@ -47,7 +47,7 @@ export class AuthModalComponent {
       this.loading = true;
       this.error = null;
 
-      await this.supabaseService.signIn(
+      await this.authService.signIn(
         this.loginForm.email,
         this.loginForm.password
       );
@@ -72,7 +72,7 @@ export class AuthModalComponent {
       this.loading = true;
       this.error = null;
 
-      await this.supabaseService.signUp(
+      await this.authService.signUp(
         this.registerForm.email,
         this.registerForm.password,
         this.registerForm.fullName

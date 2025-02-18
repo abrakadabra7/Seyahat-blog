@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../../services/supabase.service';
 import { CategoryService, Category } from '../../../../services/category.service';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-category-management',
@@ -20,7 +21,8 @@ export class CategoryManagementComponent implements OnInit {
 
   constructor(
     private supabaseService: SupabaseService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private authService: AuthService
   ) {}
 
   async ngOnInit() {
@@ -48,11 +50,11 @@ export class CategoryManagementComponent implements OnInit {
     try {
       this.loading = true;
       this.error = null;
-      const userId = this.supabaseService.currentUserValue?.id;
-      if (!userId) {
+      const currentUser = this.authService.currentUserValue;
+      if (!currentUser) {
         throw new Error('Oturum açmanız gerekiyor');
       }
-      await this.categoryService.addCategory(this.newCategoryName.trim(), userId);
+      await this.categoryService.addCategory(this.newCategoryName.trim(), currentUser.id);
       this.newCategoryName = '';
       await this.loadCategories();
     } catch (error: any) {

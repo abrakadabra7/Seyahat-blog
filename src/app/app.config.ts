@@ -4,6 +4,7 @@ import { routes } from './app.routes';
 import { SupabaseService } from './services/supabase.service';
 import { CategoryService } from './services/category.service';
 import { ProfileService } from './services/profile.service';
+import { AuthService } from './services/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,6 +16,7 @@ export const appConfig: ApplicationConfig = {
     ),
     SupabaseService,
     CategoryService,
-    ProfileService
+    ProfileService,
+    AuthService
   ]
 };
