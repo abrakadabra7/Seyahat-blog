@@ -179,6 +179,10 @@
  margin-top: -4rem; 
  position: relative;
 }
+.side-images.left {
+  margin-top: -2rem; 
+  position: relative;
+ }
 
 .side-images .image-item {
   border-radius: 12px;

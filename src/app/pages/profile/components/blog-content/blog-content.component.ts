@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../../services/supabase.service';
+import { CategoryService } from '../../../../services/category.service';
 import { User } from '@supabase/supabase-js';
 
 interface Blog {
@@ -42,7 +43,10 @@ export class BlogContentComponent implements OnChanges {
     images: []
   };
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private categoryService: CategoryService
+  ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['currentUser'] && this.currentUser) {
@@ -63,7 +67,7 @@ export class BlogContentComponent implements OnChanges {
 
   async loadCategories() {
     try {
-      const categories = await this.supabaseService.getCategories();
+      const categories = await this.categoryService.getCategories();
       this.categories = categories.map(cat => cat.name);
     } catch (error: any) {
       this.error = error.message;

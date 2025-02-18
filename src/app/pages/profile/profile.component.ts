@@ -2,18 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../services/supabase.service';
+import { ProfileService, Profile } from '../../services/profile.service';
 import { User } from '@supabase/supabase-js';
 import { BlogContentComponent } from './components/blog-content/blog-content.component';
 import { ReadBlogsComponent } from './components/read-blogs/read-blogs.component';
 import { CategoryManagementComponent } from './components/category-management/category-management.component';
-
-interface Profile {
-  id: string;
-  full_name: string;
-  avatar_url?: string;
-  created_at: string;
-  updated_at: string;
-}
 
 interface Blog {
   id?: string;
@@ -73,7 +66,11 @@ export class ProfileComponent implements OnInit {
     'Sanat'
   ];
 
-  constructor(private supabaseService: SupabaseService) {
+  constructor(
+    private supabaseService: SupabaseService,
+    private profileService: ProfileService
+  ) {
+    // Kullanıcı durumunu takip et
     this.supabaseService.currentUser$.subscribe(user => {
       this.currentUser = user;
       if (user) {
@@ -96,7 +93,9 @@ export class ProfileComponent implements OnInit {
     try {
       this.loading = true;
       this.error = null;
-      this.profile = await this.supabaseService.getProfile(this.currentUser!.id);
+      if (!this.currentUser) return;
+      
+      this.profile = await this.profileService.getProfile(this.currentUser.id);
     } catch (error: any) {
       this.error = error.message;
     } finally {
@@ -105,18 +104,18 @@ export class ProfileComponent implements OnInit {
   }
 
   async updateProfile(fullName: string) {
+    if (!this.currentUser || !this.profile) return;
+
     try {
       this.loading = true;
       this.error = null;
-      
-      if (!this.profile) return;
 
-      await this.supabaseService.updateProfile({
-        id: this.profile.id,
+      await this.profileService.updateProfile({
+        id: this.currentUser.id,
         full_name: fullName
       });
 
-      await this.loadProfile();
+      this.profile.full_name = fullName;
     } catch (error: any) {
       this.error = error.message;
     } finally {
@@ -239,9 +238,10 @@ export class ProfileComponent implements OnInit {
 
   async checkAdminStatus() {
     try {
-      this.isAdmin = await this.supabaseService.isAdmin();
-    } catch (error) {
-      console.error('Admin durumu kontrol edilirken hata oluştu:', error);
+      this.isAdmin = await this.profileService.isAdmin();
+    } catch (error: any) {
+      console.error('Admin kontrolü hatası:', error);
+      this.isAdmin = false;
     }
   }
 } 

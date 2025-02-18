@@ -329,31 +329,6 @@ export class SupabaseService {
     return data;
   }
 
-  async getProfile(userId: string) {
-    const supabase = this.ensureSupabaseInitialized();
-
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (error) throw error;
-    return data as Profile;
-  }
-
-  async updateProfile(profile: Partial<Profile>) {
-    const supabase = this.ensureSupabaseInitialized();
-
-    const { data, error } = await supabase
-      .from('profiles')
-      .update(profile)
-      .eq('id', this.currentUserValue?.id);
-
-    if (error) throw error;
-    return data;
-  }
-
   async getBlogById(id: string) {
     const supabase = this.ensureSupabaseInitialized();
     
@@ -539,61 +514,6 @@ export class SupabaseService {
     } catch (error) {
       console.error('Admin kontrolü hatası:', error);
       return false;
-    }
-  }
-
-  // Kategorileri getirme metodu
-  async getCategories(): Promise<Category[]> {
-    try {
-      const supabase = await this.ensureSupabaseInitialized();
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name');
-
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      console.error('Kategorileri getirme hatası:', error);
-      throw error;
-    }
-  }
-
-  // Kategori ekleme metodu
-  async addCategory(name: string): Promise<Category> {
-    try {
-      const supabase = await this.ensureSupabaseInitialized();
-      const user = await this.currentUserValue;
-      
-      if (!user) throw new Error('Oturum açmanız gerekiyor');
-      
-      const { data, error } = await supabase
-        .from('categories')
-        .insert([{ name, created_by: user.id }])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Kategori ekleme hatası:', error);
-      throw error;
-    }
-  }
-
-  // Kategori silme metodu
-  async deleteCategory(id: string): Promise<void> {
-    try {
-      const supabase = await this.ensureSupabaseInitialized();
-      const { error } = await supabase
-        .from('categories')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Kategori silme hatası:', error);
-      throw error;
     }
   }
 }

@@ -2,6 +2,8 @@ import { ApplicationConfig } from '@angular/core';
 import { provideRouter, withViewTransitions, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
 import { SupabaseService } from './services/supabase.service';
+import { CategoryService } from './services/category.service';
+import { ProfileService } from './services/profile.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -11,6 +13,8 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: 'top'
       })
     ),
-    SupabaseService
+    SupabaseService,
+    CategoryService,
+    ProfileService
   ]
 };
