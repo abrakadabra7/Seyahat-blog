@@ -496,4 +496,24 @@ export class SupabaseService {
       throw error;
     }
   }
+
+  async incrementBlogViewCount(blogId: string) {
+    try {
+      const supabase = await this.ensureSupabaseInitialized();
+      
+      // Mevcut okunma sayısını al ve 1 artır
+      const { data, error } = await supabase.rpc('increment_blog_view_count', {
+        blog_id: blogId
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Blog görüntülenme sayısı güncelleme hatası:', error);
+      throw error;
+    }
+  }
 }

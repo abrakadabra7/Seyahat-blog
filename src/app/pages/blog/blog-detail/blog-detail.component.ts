@@ -16,6 +16,7 @@ interface Blog {
   profiles?: {
     full_name: string;
   };
+  view_count?: number;
 }
 
 @Component({
@@ -49,9 +50,12 @@ export class BlogDetailComponent implements OnInit {
       this.error = null;
       this.blog = await this.supabaseService.getBlogById(id);
 
-      // Blog yüklendiğinde okundu olarak işaretle
-      if (this.blog) {
-        await this.supabaseService.markBlogAsRead(this.blog.id);
+      // Blog yüklendiğinde okundu olarak işaretle ve görüntülenme sayısını artır
+      if (this.blog && this.blog.id) {
+        await Promise.all([
+          this.supabaseService.markBlogAsRead(this.blog.id),
+          this.supabaseService.incrementBlogViewCount(this.blog.id)
+        ]);
       }
     } catch (error: any) {
       this.error = error.message;

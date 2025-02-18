@@ -199,3 +199,23 @@
   margin: 0 0.8rem;
   color: #ddd;
 }
+
+.views {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.views .material-icons {
+  font-size: 1.2rem;
+}
+
+/* Mevcut date::before stilini güncelleyelim */
+.date::before,
+.views::before {
+  content: "•";
+  margin: 0 0.8rem;
+  color: #ddd;
+}

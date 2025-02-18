@@ -9,6 +9,10 @@
         <span class="author">{{blog?.profiles?.full_name}}</span>
       </div>
       <span class="date">{{blog?.created_at | date:'longDate'}}</span>
+      <span class="views">
+        <span class="material-icons">visibility</span>
+        {{blog?.view_count || 0}} görüntülenme
+      </span>
     </div>
   </div>
 </div>

@@ -89,6 +89,26 @@
   opacity: 0.9;
 }
 
+.views {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.views .material-icons {
+  font-size: 1.2rem;
+}
+
+/* Mevcut date::before stilini güncelleyelim */
+.date::before,
+.views::before {
+  content: "•";
+  margin: 0 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
 .blog-detail-content {
   max-width: 1400px;
   margin: 5rem auto 3rem;

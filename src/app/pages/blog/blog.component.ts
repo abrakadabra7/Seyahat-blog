@@ -16,6 +16,7 @@ interface Blog {
   profiles?: {
     full_name: string;
   };
+  view_count?: number;
 }
 
 @Component({
