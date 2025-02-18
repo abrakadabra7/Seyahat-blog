@@ -156,7 +156,8 @@
   top: 2rem;
 }
 .side-images.right {
- margin-top: -2rem;
+ margin-top: -4rem; 
+ position: relative;
 }
 
 .side-images .image-item {

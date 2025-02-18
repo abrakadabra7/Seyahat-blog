@@ -48,6 +48,11 @@ export class BlogDetailComponent implements OnInit {
       this.loading = true;
       this.error = null;
       this.blog = await this.supabaseService.getBlogById(id);
+
+      // Blog yüklendiğinde okundu olarak işaretle
+      if (this.blog) {
+        await this.supabaseService.markBlogAsRead(this.blog.id);
+      }
     } catch (error: any) {
       this.error = error.message;
     } finally {

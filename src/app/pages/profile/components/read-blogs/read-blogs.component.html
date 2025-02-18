@@ -1,0 +1,51 @@
+<div class="read-blogs-container">
+  <div class="section-header">
+    <h2>Okuduklarım</h2>
+    <p>Okuduğunuz tüm blog yazıları burada listelenir.</p>
+  </div>
+
+  <!-- Hata Durumu -->
+  <div *ngIf="error" class="error-state">
+    <p>{{ error }}</p>
+    <button (click)="loadReadBlogs()">Tekrar Dene</button>
+  </div>
+
+  <!-- Yükleme Durumu -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Okunan bloglar yükleniyor...</p>
+  </div>
+
+  <!-- Blog Listesi -->
+  <div *ngIf="!loading && !error" class="blogs-grid">
+    <ng-container *ngIf="readBlogs.length > 0; else emptyState">
+      <div *ngFor="let blog of readBlogs" class="blog-card">
+        <div class="blog-image">
+          <img [src]="blog.image_url || 'assets/images/default-blog.jpg'" [alt]="blog.title">
+        </div>
+        <div class="blog-content">
+          <span class="category">{{ blog.category }}</span>
+          <h3>{{ blog.title }}</h3>
+          <p>{{ blog.content | slice:0:100 }}...</p>
+          <div class="blog-footer">
+            <span class="read-date">{{ blog.read_at | date:'dd.MM.yyyy' }}</span>
+            <button (click)="readAgain(blog.id)" class="read-again-btn">
+              <span class="material-icons">auto_stories</span>
+              Tekrar Oku
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Boş Durum -->
+    <ng-template #emptyState>
+      <div class="empty-state">
+        <span class="material-icons">menu_book</span>
+        <h3>Henüz blog okumadınız</h3>
+        <p>Blogları keşfetmeye başlayın ve okuduklarınızı burada takip edin.</p>
+        <button routerLink="/blog">Blogları Keşfet</button>
+      </div>
+    </ng-template>
+  </div>
+</div> 

@@ -12,6 +12,12 @@ interface Profile {
   updated_at: string;
 }
 
+interface ReadBlogResponse {
+  blog_id: string;
+  read_at: string;
+  blogs: Blog;
+}
+
 interface Blog {
   id?: string;
   user_id: string;
@@ -22,6 +28,7 @@ interface Blog {
   created_at?: string;
   updated_at?: string;
   images: string[];
+  read_at?: string;
 }
 
 @Injectable({
@@ -386,6 +393,106 @@ export class SupabaseService {
 
       return { ...blog, profiles: profile };
     } catch (error) {
+      throw error;
+    }
+  }
+
+  async getReadBlogs(): Promise<Blog[]> {
+    try {
+      const supabase = await this.ensureSupabaseInitialized();
+      const user = await this.currentUserValue;
+      
+      if (!user) {
+        throw new Error('Kullanıcı girişi yapılmamış');
+      }
+
+      const { data: readBlogs, error } = await supabase
+        .from('read_blogs')
+        .select(`
+          blog_id,
+          created_at,
+          blogs (
+            id,
+            user_id,
+            title,
+            content,
+            image_url,
+            category,
+            created_at,
+            updated_at,
+            images
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      if (!readBlogs) {
+        return [];
+      }
+
+      const blogsWithUrls = await Promise.all(readBlogs.map(async (item: any) => {
+        const blog = item.blogs;
+        blog.read_at = item.created_at;
+
+        // Kapak fotoğrafı için public URL al
+        if (blog.image_url) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('blog-images')
+            .getPublicUrl(blog.image_url);
+          blog.image_url = publicUrl;
+        }
+
+        // Ek fotoğraflar için public URL'leri al
+        if (blog.images && blog.images.length > 0) {
+          blog.images = blog.images.map((imagePath: string) => {
+            const { data: { publicUrl } } = supabase.storage
+              .from('blog-images')
+              .getPublicUrl(imagePath);
+            return publicUrl;
+          });
+        }
+
+        return blog;
+      }));
+
+      return blogsWithUrls;
+    } catch (error) {
+      console.error('Okunan blogları getirme hatası:', error);
+      throw error;
+    }
+  }
+
+  async markBlogAsRead(blogId: string | undefined) {
+    try {
+      if (!blogId) {
+        throw new Error('Blog ID geçersiz');
+      }
+
+      const supabase = await this.ensureSupabaseInitialized();
+      const user = await this.currentUserValue;
+      
+      if (!user) {
+        throw new Error('Kullanıcı girişi yapılmamış');
+      }
+
+      const { error } = await supabase
+        .from('read_blogs')
+        .upsert({
+          user_id: user.id,
+          blog_id: blogId
+        }, {
+          onConflict: 'user_id,blog_id'
+        });
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error('Blog okundu işaretleme hatası:', error);
       throw error;
     }
   }

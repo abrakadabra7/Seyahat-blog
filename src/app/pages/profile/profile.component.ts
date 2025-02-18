@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../services/supabase.service';
 import { User } from '@supabase/supabase-js';
 import { BlogContentComponent } from './components/blog-content/blog-content.component';
+import { ReadBlogsComponent } from './components/read-blogs/read-blogs.component';
 
 interface Profile {
   id: string;
@@ -28,7 +29,7 @@ interface Blog {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, BlogContentComponent],
+  imports: [CommonModule, FormsModule, BlogContentComponent, ReadBlogsComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
