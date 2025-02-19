@@ -1,4 +1,38 @@
-# SeyahatBlog
+# Seyahat Blog 
+
+## Yapılanlar
+### 13/02/2025
+- Proje oluşturuldu
+- Navbar yapıldı
+- Home page oluşturuldu
+  
+### 14/02/2025
+- Login Register modali oluşturuldu 
+- Ana sayfaya yeni özellikler eklendi
+- Hatalar giderildi
+- About sayfası oluşturuldu
+- Contact us sayfası oluşturuldu
+
+ ### 17/02/2025
+- Profile sayfası oluşturuldu
+- Blog sayfası oluşturuldu
+- Supabase bağlantısı kuruldu
+
+  
+ ### 18/02/2025
+ - Okunan blogları görme özelliği eklendi
+ - Okunma sayısı istatistiği eklendi
+ - Admine özel fonksiyonlar eklendi
+
+   
+ ### 19/02/2025 
+ - Kodlar daha okunabilir hale getirildi
+ 
+<br>
+
+## Youtube Videosu İçin Görsele Tıklayabilirsiniz 
+[<img src="https://github.com/abrakadabra7/Seyahat-blog/blob/master/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202025-02-19%20131732.png" width="50%">](https://youtu.be/fkRaoYcoKKU " Trevelling Blog With Angular")
+<br><br>
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.5.
 
