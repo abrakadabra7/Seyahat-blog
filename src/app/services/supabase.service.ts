@@ -4,18 +4,13 @@ import { environment } from '../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from './auth.service';
 
+// Interfaces
 interface Profile {
   id: string;
   full_name: string;
   avatar_url?: string;
   created_at: string;
   updated_at: string;
-}
-
-interface ReadBlogResponse {
-  blog_id: string;
-  read_at: string;
-  blogs: Blog;
 }
 
 interface Blog {
@@ -29,13 +24,10 @@ interface Blog {
   updated_at?: string;
   images: string[];
   read_at?: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  created_at: string;
-  created_by: string;
+  profiles?: {
+    full_name: string;
+  };
+  view_count?: number;
 }
 
 @Injectable({
@@ -43,18 +35,19 @@ interface Category {
 })
 export class SupabaseService {
   private supabase?: SupabaseClient;
-  private platformId = inject(PLATFORM_ID);
-  private isBrowser: boolean;
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly isBrowser: boolean;
+  private readonly STORAGE_BUCKET = 'blog-images';
 
   constructor(private authService: AuthService) {
     this.isBrowser = isPlatformBrowser(this.platformId);
-    
     if (this.isBrowser) {
       this.initSupabase();
     }
   }
 
-  private initSupabase() {
+  // Initialization Methods
+  private initSupabase(): void {
     if (!this.isBrowser) return;
 
     this.supabase = createClient(
@@ -63,7 +56,7 @@ export class SupabaseService {
     );
   }
 
-  private ensureSupabaseInitialized() {
+  private ensureSupabaseInitialized(): SupabaseClient {
     if (!this.isBrowser) {
       throw new Error('Bu işlem sadece tarayıcıda kullanılabilir');
     }
@@ -76,311 +69,204 @@ export class SupabaseService {
     return this.supabase;
   }
 
-  // Blog işlemleri için yeni metodlar
-  async getBlogs(userId: string) {
-    const supabase = this.ensureSupabaseInitialized();
-    const { data, error } = await supabase
-      .from('blogs')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    // Her blog için fotoğrafların public URL'lerini al
-    const blogsWithUrls = await Promise.all(data.map(async (blog) => {
-      // Kapak fotoğrafı için public URL al
-      if (blog.image_url) {
-        const { data: { publicUrl: coverImageUrl } } = supabase.storage
-          .from('blog-images')
-          .getPublicUrl(blog.image_url);
-        blog.image_url = coverImageUrl;
-      }
-
-      // Ek fotoğraflar için public URL'leri al
-      if (blog.images && blog.images.length > 0) {
-        blog.images = blog.images.map((imagePath: string) => {
-          const { data: { publicUrl } } = supabase.storage
-            .from('blog-images')
-            .getPublicUrl(imagePath);
-          return publicUrl;
-        });
-      }
-
-      return blog;
-    }));
-
-    return blogsWithUrls as Blog[];
+  // Helper Methods
+  private async getCurrentUser(): Promise<User> {
+    const user = this.authService.currentUserValue;
+    if (!user) throw new Error('Kullanıcı oturum açmamış');
+    return user;
   }
 
-  async getAllBlogs() {
+  private async handleError(error: any, customMessage?: string): Promise<never> {
+    console.error(customMessage || 'İşlem hatası:', error);
+    throw new Error(error.message);
+  }
+
+  private async uploadFile(file: File, userId: string): Promise<string> {
     const supabase = this.ensureSupabaseInitialized();
-    
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `${userId}/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(this.STORAGE_BUCKET)
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+    return filePath;
+  }
+
+  private getPublicUrl(path: string): string {
+    const supabase = this.ensureSupabaseInitialized();
+    const { data: { publicUrl } } = supabase.storage
+      .from(this.STORAGE_BUCKET)
+      .getPublicUrl(path);
+    return publicUrl;
+  }
+
+  private enrichBlogWithUrls(blog: Blog): Blog {
+    if (blog.image_url) {
+      blog.image_url = this.getPublicUrl(blog.image_url);
+    }
+
+    if (blog.images?.length > 0) {
+      blog.images = blog.images.map(path => this.getPublicUrl(path));
+    }
+
+    return blog;
+  }
+
+  private async getProfileForBlog(userId: string): Promise<{ full_name: string }> {
+    const supabase = this.ensureSupabaseInitialized();
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('Profil getirme hatası:', error);
+      return { full_name: 'Anonim' };
+    }
+
+    return profile;
+  }
+
+  // Blog CRUD Operations
+  async getBlogs(userId: string): Promise<Blog[]> {
     try {
-      // Önce tüm blogları getir
-      const { data: blogs, error: blogsError } = await supabase
+      const supabase = this.ensureSupabaseInitialized();
+      const { data, error } = await supabase
+        .from('blogs')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data.map(blog => this.enrichBlogWithUrls(blog));
+    } catch (error) {
+      return this.handleError(error, 'Blogları getirme hatası');
+    }
+  }
+
+  async getAllBlogs(): Promise<Blog[]> {
+    try {
+      const supabase = this.ensureSupabaseInitialized();
+      const { data: blogs, error } = await supabase
         .from('blogs')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (blogsError) throw blogsError;
+      if (error) throw error;
       if (!blogs) return [];
 
-      // Her blog için profil bilgisini ve fotoğraf URL'lerini al
-      const blogsWithProfilesAndUrls = await Promise.all(
+      return await Promise.all(
         blogs.map(async (blog) => {
-          // Profil bilgisini al
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('full_name')
-            .eq('id', blog.user_id)
-            .single();
-
-          if (profileError) {
-            console.error('Profil getirme hatası:', profileError);
-            return { ...blog, profiles: { full_name: 'Anonim' } };
-          }
-
-          // Kapak fotoğrafı için public URL al
-          if (blog.image_url) {
-            const { data: { publicUrl: coverImageUrl } } = supabase.storage
-              .from('blog-images')
-              .getPublicUrl(blog.image_url);
-            blog.image_url = coverImageUrl;
-          }
-
-          // Ek fotoğraflar için public URL'leri al
-          if (blog.images && blog.images.length > 0) {
-            blog.images = blog.images.map((imagePath: string) => {
-              const { data: { publicUrl } } = supabase.storage
-                .from('blog-images')
-                .getPublicUrl(imagePath);
-              return publicUrl;
-            });
-          }
-
-          return { ...blog, profiles: profile };
+          const profile = await this.getProfileForBlog(blog.user_id);
+          const enrichedBlog = this.enrichBlogWithUrls(blog);
+          return { ...enrichedBlog, profiles: profile };
         })
       );
-
-      return blogsWithProfilesAndUrls;
     } catch (error) {
-      throw error;
+      return this.handleError(error, 'Tüm blogları getirme hatası');
     }
   }
 
-  async addBlog(blog: Blog, coverFile: File, additionalFiles?: File[]): Promise<Blog> {
-    const supabase = this.ensureSupabaseInitialized();
+  async getBlogById(id: string): Promise<Blog> {
     try {
-      const currentUser = this.authService.currentUserValue;
-      if (!currentUser) throw new Error('Kullanıcı oturum açmamış');
-
-      // Kapak fotoğrafını yükle
-      if (coverFile) {
-        const fileExt = coverFile.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `${currentUser.id}/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('blog-images')
-          .upload(filePath, coverFile);
-
-        if (uploadError) throw uploadError;
-        blog.image_url = filePath;
-      }
-
-      // Ek fotoğrafları yükle
-      blog.images = [];
-      if (additionalFiles && additionalFiles.length > 0) {
-        const uploadPromises = additionalFiles.map(async (file) => {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${Math.random()}.${fileExt}`;
-          const filePath = `${currentUser.id}/${fileName}`;
-
-          const { error: uploadError } = await supabase.storage
-            .from('blog-images')
-            .upload(filePath, file);
-
-          if (uploadError) throw uploadError;
-          return filePath;
-        });
-
-        blog.images = await Promise.all(uploadPromises);
-      }
-
-      // Blog'u veritabanına kaydet
-      const { data, error } = await supabase
-        .from('blogs')
-        .insert(blog)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Public URL'leri al
-      if (data.image_url) {
-        const { data: { publicUrl: coverImageUrl } } = supabase.storage
-          .from('blog-images')
-          .getPublicUrl(data.image_url);
-        data.image_url = coverImageUrl;
-      }
-
-      if (data.images && data.images.length > 0) {
-        data.images = data.images.map((imagePath: string) => {
-          const { data: { publicUrl } } = supabase.storage
-            .from('blog-images')
-            .getPublicUrl(imagePath);
-          return publicUrl;
-        });
-      }
-
-      return data;
-    } catch (error: any) {
-      throw new Error(error.message);
-    }
-  }
-
-  async deleteBlog(id: string) {
-    const supabase = this.ensureSupabaseInitialized();
-    const { error } = await supabase
-      .from('blogs')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-  }
-
-  async getBlogById(id: string) {
-    const supabase = this.ensureSupabaseInitialized();
-    
-    try {
-      // Blog bilgilerini getir
-      const { data: blog, error: blogError } = await supabase
+      const supabase = this.ensureSupabaseInitialized();
+      const { data: blog, error } = await supabase
         .from('blogs')
         .select('*')
         .eq('id', id)
         .single();
 
-      if (blogError) throw blogError;
+      if (error) throw error;
       if (!blog) throw new Error('Blog bulunamadı');
 
-      // Yazar bilgilerini getir
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('id', blog.user_id)
-        .single();
-
-      if (profileError) {
-        console.error('Profil getirme hatası:', profileError);
-        return { ...blog, profiles: { full_name: 'Anonim' } };
-      }
-
-      // Kapak fotoğrafı için public URL al
-      if (blog.image_url) {
-        const { data: { publicUrl: coverImageUrl } } = supabase.storage
-          .from('blog-images')
-          .getPublicUrl(blog.image_url);
-        blog.image_url = coverImageUrl;
-      }
-
-      // Ek fotoğraflar için public URL'leri al
-      if (blog.images && blog.images.length > 0) {
-        blog.images = blog.images.map((imagePath: string) => {
-          const { data: { publicUrl } } = supabase.storage
-            .from('blog-images')
-            .getPublicUrl(imagePath);
-          return publicUrl;
-        });
-      }
-
-      return { ...blog, profiles: profile };
+      const profile = await this.getProfileForBlog(blog.user_id);
+      const enrichedBlog = this.enrichBlogWithUrls(blog);
+      return { ...enrichedBlog, profiles: profile };
     } catch (error) {
-      throw error;
+      return this.handleError(error, 'Blog detayı getirme hatası');
     }
   }
 
+  async addBlog(blog: Blog, coverFile: File, additionalFiles?: File[]): Promise<Blog> {
+    try {
+      const currentUser = await this.getCurrentUser();
+      const supabase = this.ensureSupabaseInitialized();
+
+      // Fotoğrafları yükle
+      if (coverFile) {
+        blog.image_url = await this.uploadFile(coverFile, currentUser.id);
+      }
+
+      blog.images = [];
+      if (additionalFiles?.length) {
+        blog.images = await Promise.all(
+          additionalFiles.map(file => this.uploadFile(file, currentUser.id))
+        );
+      }
+
+      // Blog'u kaydet
+      const { data, error } = await supabase
+        .from('blogs')
+        .insert({ ...blog, user_id: currentUser.id })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return this.enrichBlogWithUrls(data);
+    } catch (error) {
+      return this.handleError(error, 'Blog ekleme hatası');
+    }
+  }
+
+  async deleteBlog(id: string): Promise<void> {
+    try {
+      const supabase = this.ensureSupabaseInitialized();
+      const { error } = await supabase
+        .from('blogs')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    } catch (error) {
+      return this.handleError(error, 'Blog silme hatası');
+    }
+  }
+
+  // Blog Reading Operations
   async getReadBlogs(): Promise<Blog[]> {
     try {
-      const supabase = await this.ensureSupabaseInitialized();
-      const user = await this.authService.currentUserValue;
-      
-      if (!user) {
-        throw new Error('Kullanıcı girişi yapılmamış');
-      }
+      const supabase = this.ensureSupabaseInitialized();
+      const user = await this.getCurrentUser();
 
       const { data: readBlogs, error } = await supabase
         .from('read_blogs')
-        .select(`
-          blog_id,
-          created_at,
-          blogs (
-            id,
-            user_id,
-            title,
-            content,
-            image_url,
-            category,
-            created_at,
-            updated_at,
-            images
-          )
-        `)
+        .select('blog_id, created_at, blogs (*)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
+      if (!readBlogs) return [];
 
-      if (!readBlogs) {
-        return [];
-      }
-
-      const blogsWithUrls = await Promise.all(readBlogs.map(async (item: any) => {
+      return readBlogs.map((item: any) => {
         const blog = item.blogs;
         blog.read_at = item.created_at;
-
-        // Kapak fotoğrafı için public URL al
-        if (blog.image_url) {
-          const { data: { publicUrl } } = supabase.storage
-            .from('blog-images')
-            .getPublicUrl(blog.image_url);
-          blog.image_url = publicUrl;
-        }
-
-        // Ek fotoğraflar için public URL'leri al
-        if (blog.images && blog.images.length > 0) {
-          blog.images = blog.images.map((imagePath: string) => {
-            const { data: { publicUrl } } = supabase.storage
-              .from('blog-images')
-              .getPublicUrl(imagePath);
-            return publicUrl;
-          });
-        }
-
-        return blog;
-      }));
-
-      return blogsWithUrls;
+        return this.enrichBlogWithUrls(blog);
+      });
     } catch (error) {
-      console.error('Okunan blogları getirme hatası:', error);
-      throw error;
+      return this.handleError(error, 'Okunan blogları getirme hatası');
     }
   }
 
-  async markBlogAsRead(blogId: string | undefined) {
+  async markBlogAsRead(blogId: string | undefined): Promise<void> {
     try {
-      if (!blogId) {
-        throw new Error('Blog ID geçersiz');
-      }
-
-      const supabase = await this.ensureSupabaseInitialized();
-      const user = await this.authService.currentUserValue;
+      if (!blogId) throw new Error('Blog ID geçersiz');
       
-      if (!user) {
-        throw new Error('Kullanıcı girişi yapılmamış');
-      }
+      const supabase = this.ensureSupabaseInitialized();
+      const user = await this.getCurrentUser();
 
       const { error } = await supabase
         .from('read_blogs')
@@ -391,40 +277,31 @@ export class SupabaseService {
           onConflict: 'user_id,blog_id'
         });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
     } catch (error) {
-      console.error('Blog okundu işaretleme hatası:', error);
-      throw error;
+      return this.handleError(error, 'Blog okundu işaretleme hatası');
     }
   }
 
-  async incrementBlogViewCount(blogId: string) {
+  // Blog Statistics
+  async incrementBlogViewCount(blogId: string): Promise<number> {
     try {
-      const supabase = await this.ensureSupabaseInitialized();
-      
-      // Mevcut okunma sayısını al ve 1 artır
+      const supabase = this.ensureSupabaseInitialized();
       const { data, error } = await supabase.rpc('increment_blog_view_count', {
         blog_id: blogId
       });
 
-      if (error) {
-        throw error;
-      }
-
+      if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Blog görüntülenme sayısı güncelleme hatası:', error);
-      throw error;
+      return this.handleError(error, 'Blog görüntülenme sayısı güncelleme hatası');
     }
   }
 
+  // User Operations
   async isAdmin(): Promise<boolean> {
     try {
-      const user = await this.authService.currentUserValue;
-      if (!user) return false;
-      
+      const user = await this.getCurrentUser();
       const { data: profile } = await this.supabase!
         .from('profiles')
         .select('is_admin')
